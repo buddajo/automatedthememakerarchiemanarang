@@ -344,11 +344,11 @@
                     <input type="text" id="hook" placeholder="What makes people stop scrolling?">
 
                     <label>Must-Have Sections</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px;">
-                        <div style="font-size: 0.85rem;"><input type="checkbox" checked style="width: auto; margin-bottom: 0;"> Hero Slider</div>
-                        <div style="font-size: 0.85rem;"><input type="checkbox" checked style="width: auto; margin-bottom: 0;"> Testimonials</div>
-                        <div style="font-size: 0.85rem;"><input type="checkbox" checked style="width: auto; margin-bottom: 0;"> Value Props</div>
-                        <div style="font-size: 0.85rem;"><input type="checkbox" style="width: auto; margin-bottom: 0;"> Comparison Table</div>
+                    <div id="section-checks" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px;">
+                        <div style="font-size: 0.85rem;"><input type="checkbox" value="Hero Slider" checked style="width: auto; margin-bottom: 0;"> Hero Slider</div>
+                        <div style="font-size: 0.85rem;"><input type="checkbox" value="Testimonials" checked style="width: auto; margin-bottom: 0;"> Testimonials</div>
+                        <div style="font-size: 0.85rem;"><input type="checkbox" value="Value Props" checked style="width: auto; margin-bottom: 0;"> Value Props</div>
+                        <div style="font-size: 0.85rem;"><input type="checkbox" value="Comparison Table" style="width: auto; margin-bottom: 0;"> Comparison Table</div>
                     </div>
 
                     <div class="nav-footer">
@@ -421,6 +421,58 @@
 </div>
 
 <script>
+    const apiKey = ""; // Runtime provides this
+
+    async function callGemini(prompt, isJson = false) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        const payload = {
+            contents: [{ parts: [{ text: prompt }] }],
+            systemInstruction: { parts: [{ text: "You are a world-class Shopify Creative Director. Provide strategic design choices based on user briefs. Be concise but specific." }] }
+        };
+
+        if (isJson) {
+            payload.generationConfig = { 
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: "OBJECT",
+                    properties: {
+                        headingFont: { type: "STRING" },
+                        bodyFont: { type: "STRING" },
+                        colors: { 
+                            type: "ARRAY", 
+                            items: { 
+                                type: "OBJECT", 
+                                properties: { name: { type: "STRING" }, hex: { type: "STRING" } } 
+                            } 
+                        },
+                        refAnalysis: { type: "STRING" },
+                        buildSteps: { type: "ARRAY", items: { type: "STRING" } }
+                    }
+                }
+            };
+        }
+
+        let retries = 5;
+        let delay = 1000;
+
+        for (let i = 0; i < retries; i++) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error('API Error');
+                const result = await response.json();
+                return result.candidates?.[0]?.content?.parts?.[0]?.text;
+            } catch (e) {
+                if (i === retries - 1) throw e;
+                await new Promise(r => setTimeout(r, delay));
+                delay *= 2;
+            }
+        }
+    }
+
     function showQuestionnaire() {
         document.getElementById('viewport').className = 'swipe-1';
         window.scrollTo(0,0);
@@ -462,48 +514,62 @@
         }
     }
 
-    function triggerProposal() {
-        const brand = document.getElementById('brand_name').value || "Your Brand";
-        const refs = document.getElementById('ref_sites').value;
+    async function triggerProposal() {
+        const formData = {
+            brand: document.getElementById('brand_name').value || "Unnamed Brand",
+            industry: document.getElementById('industry').value,
+            goal: document.getElementById('site_goal').value,
+            vibe: document.getElementById('vibe').value,
+            typo: document.getElementById('typo_vibe').value,
+            color: document.getElementById('color_pref').value,
+            refs: document.getElementById('ref_sites').value,
+            voice: document.getElementById('voice').value,
+            avatar: document.getElementById('avatar').value,
+            hook: document.getElementById('hook').value,
+            sections: Array.from(document.querySelectorAll('#section-checks input:checked')).map(i => i.value)
+        };
+
         document.getElementById('loader').style.display = 'flex';
-        document.getElementById('loader').querySelector('div').innerText = "Creative Director is thinking...";
-        
-        setTimeout(() => {
+        document.getElementById('loader').querySelector('div').innerText = "AI Creative Director is thinking...";
+        document.getElementById('loader').querySelector('p').innerText = "Analyzing color choices and reference sites...";
+
+        const prompt = `Generate a Shopify design proposal based on this brief:
+        Brand: ${formData.brand} in ${formData.industry}. 
+        Goal: ${formData.goal}.
+        Aesthetic: ${formData.vibe} with a ${formData.color} color palette and ${formData.typo} typography.
+        References: ${formData.refs}
+        Target: ${formData.avatar}
+        Hook: ${formData.hook}
+        Voice: ${formData.voice}
+        Sections requested: ${formData.sections.join(', ')}
+
+        Analyze the 'color palette' text specifically to generate actual Hex codes that match the vibe.
+        Analyze reference sites to suggest a plan.`;
+
+        try {
+            const responseText = await callGemini(prompt, true);
+            const strategy = JSON.parse(responseText);
+
             document.getElementById('loader').style.display = 'none';
             document.getElementById('viewport').className = 'swipe-2';
             
-            document.getElementById('prop-brand').innerText = brand + " Build Plan";
-            document.getElementById('prop-font-head').innerText = "Cormorant Garamond";
-            document.getElementById('prop-font-body').innerText = "Inter (62.5% Scaling)";
+            document.getElementById('prop-brand').innerText = formData.brand + " Build Plan";
+            document.getElementById('prop-font-head').innerText = strategy.headingFont;
+            document.getElementById('prop-font-body').innerText = strategy.bodyFont;
+            document.getElementById('ref-analysis').innerText = strategy.refAnalysis;
             
-            if(refs) {
-                document.getElementById('ref-analysis').innerText = "References analyzed. Adopting Glossier-style 'sticky' product grids and Apple-inspired whitespace hierarchies.";
-            }
-
-            const colors = [
-                { name: "Background", hex: "#FFFFFF" },
-                { name: "Text", hex: "#1A1A1A" },
-                { name: "Accent", hex: "#D4AF37" },
-                { name: "Muted", hex: "#F5F5F7" }
-            ];
-            
-            document.getElementById('palette-list').innerHTML = colors.map(c => `
+            document.getElementById('palette-list').innerHTML = strategy.colors.map(c => `
                 <div class="palette-item">
                     <span class="color-dot" style="background:${c.hex}"></span>
                     <b>${c.name}:</b> ${c.hex}
                 </div>
             `).join('');
 
-            const plan = [
-                "Initialize layout/theme.liquid with Lucide & Splide CDNs",
-                "Generate Premium Hero Section with massive typography",
-                "Build AJAX-powered Feature Collection grid",
-                "Design interactive Marquee / Hook section",
-                "Compile into downloadable .zip package"
-            ];
-            document.getElementById('build-plan').innerHTML = plan.map(item => `<li>${item}</li>`).join('');
-
-        }, 1200);
+            document.getElementById('build-plan').innerHTML = strategy.buildSteps.map(item => `<li>${item}</li>`).join('');
+        } catch (error) {
+            document.getElementById('loader').style.display = 'none';
+            alert("The Creative Director is busy right now. Please try again in a moment.");
+        }
     }
 
     function startGeneration() {
