@@ -69,7 +69,6 @@
         /* LANDING PAGE SECTIONS */
         .landing-wrapper { overflow-y: auto; height: 100vh; }
 
-        /* 1. Hero */
         .hero {
             height: 100vh;
             display: flex;
@@ -82,12 +81,10 @@
         .hero h1 { font-size: 5rem; margin: 0; letter-spacing: -3px; font-weight: 700; }
         .hero p { font-size: 1.4rem; color: var(--muted); margin: 20px 0 40px; max-width: 600px; }
 
-        /* 2. The Problem */
         .section-padding { padding: 120px 0; border-bottom: 1px solid var(--silver); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
         .label { text-transform: uppercase; font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: var(--muted); margin-bottom: 20px; display: block; }
         
-        /* 3-8 sections styled generically for the landing page */
         .feature-card { padding: 40px; background: var(--accent); border-radius: 24px; }
         .feature-card h3 { margin-top: 0; font-size: 1.5rem; }
 
@@ -137,7 +134,6 @@
         .nav-footer { display: flex; justify-content: space-between; margin-top: 20px; align-items: center; }
         .btn-back { background: none; border: 1px solid var(--silver); padding: 15px 30px; border-radius: 100px; cursor: pointer; }
 
-        /* Progress Bar */
         .progress-bar {
             height: 4px;
             background: var(--silver);
@@ -154,7 +150,6 @@
             transition: width 0.4s ease;
         }
 
-        /* Swipe Trigger State */
         .swiped { transform: translateX(-100vw); }
 
     </style>
@@ -165,16 +160,13 @@
     
     <!-- PAGE 1: THE LANDING PAGE -->
     <div class="full-page landing-wrapper">
-        
-        <!-- SECTION 1: HERO -->
         <section class="hero">
             <span class="label">Next-Gen Shopify Tool</span>
             <h1>ThemeGen AI</h1>
-            <p>We convert your brand questionnaire into high-conversion Shopify sections using Gemini 1.5 Pro.</p>
+            <p>Convert brand briefs into high-conversion, premium Shopify sections instantly.</p>
             <button class="btn btn-black" onclick="toggleView()">Start Creating Themes</button>
         </section>
 
-        <!-- SECTION 2: THE PROBLEM -->
         <section class="section-padding">
             <div class="container grid">
                 <div>
@@ -182,54 +174,10 @@
                     <h2>Stop Rewriting <br>Boilerplate Code.</h2>
                 </div>
                 <div>
-                    <p style="font-size: 1.2rem; line-height: 1.7;">Shopify developers spend 40% of their time writing repetitive Liquid schemas and CSS resets. We've automated the structure so you can focus on the creative.</p>
+                    <p style="font-size: 1.2rem; line-height: 1.7;">Manual Shopify development is slow. We've automated the architecture so you can focus on high-end UI/UX delivery.</p>
                 </div>
             </div>
         </section>
-
-        <!-- SECTION 3: THE ENGINE -->
-        <section class="section-padding">
-            <div class="container">
-                <span class="label">The Engine</span>
-                <div class="grid">
-                    <div class="feature-card">
-                        <h3>AI-Driven Schema</h3>
-                        <p>Our engine generates valid <code>{% schema %}</code> tags for every section automatically.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>Clean Liquid</h3>
-                        <p>No bloat. Just the Liquid you need, styled with scoped CSS and optimized JS.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 4: HOW IT WORKS -->
-        <section class="section-padding" style="background: #fafafa;">
-            <div class="container">
-                <center>
-                    <span class="label">Workflow</span>
-                    <h2 style="margin-bottom: 60px;">From Onboarding to Zip in 3 Steps.</h2>
-                </center>
-                <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 30px;">
-                    <div style="text-align: center;">
-                        <h4 style="font-size: 3rem; margin: 0; color: var(--silver);">01</h4>
-                        <p><b>Fill Questionnaire</b><br>Sync your client onboarding notes.</p>
-                    </div>
-                    <div style="text-align: center;">
-                        <h4 style="font-size: 3rem; margin: 0; color: var(--silver);">02</h4>
-                        <p><b>Preview AI Build</b><br>See the code render in real-time.</p>
-                    </div>
-                    <div style="text-align: center;">
-                        <h4 style="font-size: 3rem; margin: 0; color: var(--silver);">03</h4>
-                        <p><b>Deploy Theme</b><br>Download the clean Shopify folder.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 5-8: Additional Content can go here -->
-
     </div>
 
     <!-- PAGE 2: THE INTERACTIVE QUESTIONNAIRE -->
@@ -242,17 +190,17 @@
                 <div class="step active" id="step1">
                     <span class="label">Step 1 of 3</span>
                     <h2>Identity & Focus</h2>
-                    <p>Let's define the foundation of your new Shopify theme.</p>
+                    <p>Let's define the foundation of your custom theme build.</p>
                     
                     <label>Brand Name</label>
-                    <input type="text" id="brand_name" value="" placeholder="e.g. Acme Co.">
+                    <input type="text" id="brand_name" placeholder="e.g. Acme Co.">
                     
-                    <label>Main Goal for Website</label>
+                    <label>Primary Business Objective</label>
                     <select id="site_goal">
-                        <option value="" disabled selected>Select your primary objective</option>
-                        <option value="direct_sales">Increase total GMV and order volume</option>
-                        <option value="brand_trust">Build brand credibility and trust</option>
-                        <option value="conversion">Optimise conversion rate on Social Commerce</option>
+                        <option value="" disabled selected>Select objective</option>
+                        <option value="direct_sales">Maximize GMV & Order Volume</option>
+                        <option value="brand_trust">Premium Identity & Credibility</option>
+                        <option value="social_commerce">TikTok/Meta Ad Conversion</option>
                     </select>
 
                     <div class="nav-footer">
@@ -265,13 +213,13 @@
                 <div class="step" id="step2">
                     <span class="label">Step 2 of 3</span>
                     <h2>Design Aesthetics</h2>
-                    <p>Define the visual language of the sections.</p>
+                    <p>Define the creative direction for the AI Creative Director.</p>
                     
-                    <label>Visual Vibe</label>
-                    <input type="text" id="vibe" placeholder="e.g. Modern, Minimalist, High-end, Bold">
+                    <label>Industry & Visual Vibe</label>
+                    <input type="text" id="vibe" placeholder="e.g. Luxury Skincare, Minimalist, Bold Typography">
                     
-                    <label>Hero Product Focus</label>
-                    <input type="text" id="hero_product" value="" placeholder="Primary product or collection to highlight">
+                    <label>Key Hero Product / Collection</label>
+                    <input type="text" id="hero_product" placeholder="What are we featuring first?">
 
                     <div class="nav-footer">
                         <button type="button" class="btn-back" onclick="moveStep(1)">Back</button>
@@ -282,14 +230,14 @@
                 <!-- Step 3 -->
                 <div class="step" id="step3">
                     <span class="label">Step 3 of 3</span>
-                    <h2>Audience Context</h2>
-                    <p>Who are we building for?</p>
+                    <h2>Marketing Context</h2>
+                    <p>Finalizing the architectural brief.</p>
                     
-                    <label>Target Customer Avatar</label>
-                    <textarea id="avatar" rows="3" placeholder="Describe your ideal customer (age, interests, pain points)..."></textarea>
+                    <label>Target Audience Description</label>
+                    <textarea id="avatar" rows="3" placeholder="Who is the ideal customer?"></textarea>
                     
-                    <label>Core Marketing Hook</label>
-                    <input type="text" id="hook" value="" placeholder="What makes your product unique?">
+                    <label>The Core Marketing "Hook"</label>
+                    <input type="text" id="hook" placeholder="What is the unique selling point?">
 
                     <div class="nav-footer">
                         <button type="button" class="btn-back" onclick="moveStep(2)">Back</button>
@@ -310,32 +258,51 @@
     }
 
     function moveStep(stepNum) {
-        // Update Steps
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
         document.getElementById('step' + stepNum).classList.add('active');
-
-        // Update Progress Bar
         const progress = (stepNum / 3) * 100;
         document.getElementById('progress').style.width = progress + '%';
     }
 
+    /**
+     * FINAL BUILD ENGINE
+     * This prepares the specialized prompt for the AI transition
+     */
     function finishBuild() {
-        const data = {
-            brand: document.getElementById('brand_name').value,
+        const userInput = {
+            brandName: document.getElementById('brand_name').value,
             goal: document.getElementById('site_goal').value,
             vibe: document.getElementById('vibe').value,
             product: document.getElementById('hero_product').value,
-            avatar: document.getElementById('avatar').value,
+            audience: document.getElementById('avatar').value,
             hook: document.getElementById('hook').value
         };
 
-        if(!data.brand) {
-            alert("Please provide a brand name to continue.");
-            return;
-        }
+        if(!userInput.brandName) { alert("Brand Name is required."); return; }
 
-        console.log("SENDING DATA TO AI:", data);
-        alert(`Initializing Gemini Build for ${data.brand}...\n\nIn the next phase, we will trigger the AI to generate the Liquid sections for your brand.`);
+        // Preparing the "System Context" based on your Senior Dev Prompt
+        const systemDirectives = `
+            ROLE: Senior Full-Stack Shopify Developer & Creative Director.
+            TECH STACK: Splide.js (CDN), Lucide Icons (CDN).
+            RULES: No Dawn theme dependencies. Self-contained .liquid sections. 
+            DESIGN: Premium, 62.5% font scaling (1rem = 10px). Max-width 1920px.
+            ANIMATION: Smooth 0.3s ease transitions, 2rem+ rounded corners.
+        `;
+
+        const finalBrief = `
+            PROJECT BRIEF:
+            Brand: ${userInput.brandName}
+            Objective: ${userInput.goal}
+            Vibe: ${userInput.vibe}
+            Focus: ${userInput.product}
+            Target Audience: ${userInput.audience}
+            Unique Hook: ${userInput.hook}
+        `;
+
+        console.log("SYSTEM DIRECTIVES:", systemDirectives);
+        console.log("FINAL BRIEF:", finalBrief);
+
+        alert(`Brief Finalized for ${userInput.brandName}!\n\nAI is now standing by to propose Typography and Color Palette based on your directives.\n\nCheck Console (F12) for the full payload.`);
     }
 </script>
 
