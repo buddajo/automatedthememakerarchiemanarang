@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ThemeGen AI | Shopify Section Engine</title>
-    <!-- Modern Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -31,7 +30,6 @@
             scroll-behavior: smooth;
         }
 
-        /* 4-Page Horizontal Slider */
         #viewport {
             width: 400vw;
             display: flex;
@@ -39,18 +37,9 @@
             will-change: transform;
         }
 
-        .full-page {
-            width: 100vw;
-            min-height: 100vh;
-            position: relative;
-        }
+        .full-page { width: 100vw; min-height: 100vh; position: relative; }
 
-        /* Shared Components */
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 40px;
-        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 40px; }
 
         .btn {
             display: inline-block;
@@ -70,9 +59,7 @@
         .btn-outline { background: transparent; border: 1px solid var(--silver); color: var(--text); }
         .btn-sm { padding: 12px 24px; font-size: 0.85rem; border-radius: 12px; }
 
-        /* LANDING PAGE SECTIONS */
         .landing-wrapper { overflow-y: auto; height: 100vh; }
-
         .hero {
             height: 100vh;
             display: flex;
@@ -87,14 +74,7 @@
 
         .label { text-transform: uppercase; font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: var(--muted); margin-bottom: 20px; display: block; }
         
-        /* APP PAGES */
-        .app-page {
-            background-color: #f2f2f7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-        }
+        .app-page { background-color: #f2f2f7; display: flex; align-items: center; justify-content: center; padding: 40px; }
 
         .form-container {
             background: #fff;
@@ -126,149 +106,101 @@
             font-size: 1rem;
             margin-bottom: 24px;
             font-family: inherit;
-            transition: border 0.2s ease;
-        }
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--black);
         }
 
         .nav-footer { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--silver); align-items: center; }
         .btn-back { background: none; border: 1px solid var(--silver); padding: 15px 30px; border-radius: 100px; cursor: pointer; font-weight: 600; }
 
-        .progress-bar {
-            height: 4px; background: var(--silver); width: 100%; position: absolute; top: 0; left: 0; border-radius: 32px 32px 0 0; overflow: hidden;
-        }
+        .progress-bar { height: 4px; background: var(--silver); width: 100%; position: absolute; top: 0; left: 0; border-radius: 32px 32px 0 0; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--black); width: 33%; transition: width 0.4s ease; }
 
-        /* UPLOAD AREA */
-        .upload-section {
-            background: #f9f9fb;
-            border: 2px dashed var(--silver);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .section-divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 25px 0;
-            color: var(--muted);
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-        .section-divider::before, .section-divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid var(--silver);
-        }
+        .upload-section { background: #f9f9fb; border: 2px dashed var(--silver); border-radius: 20px; padding: 20px; margin-bottom: 30px; text-align: center; }
+        .section-divider { display: flex; align-items: center; text-align: center; margin: 25px 0; color: var(--muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+        .section-divider::before, .section-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--silver); }
         .section-divider:not(:empty)::before { margin-right: .5em; }
         .section-divider:not(:empty)::after { margin-left: .5em; }
 
-        .upload-options {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 15px;
+        .loading-overlay { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255,255,255,0.98); z-index: 100; display: none;
+            flex-direction: column; justify-content: center; align-items: center; border-radius: 32px;
+            text-align: center; padding: 40px;
         }
 
-        /* PROPOSAL & GENERATION VIEW STYLES */
+        .spinner {
+            width: 50px; height: 50px;
+            border: 5px solid var(--silver);
+            border-top: 5px solid var(--black);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 24px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         .proposal-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; margin-top: 30px; }
         .color-dot { width: 30px; height: 30px; border-radius: 50%; display: inline-block; margin-right: 10px; border: 1px solid #ddd; }
         .palette-item { display: flex; align-items: center; margin-bottom: 15px; font-size: 0.9rem; }
         
-        /* Circle Loader Style */
-        .loading-overlay { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(255,255,255,0.95); z-index: 10; display: none;
-            flex-direction: column; justify-content: center; align-items: center; border-radius: 32px;
-        }
-
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid var(--silver);
-            border-top: 4px solid var(--black);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* CONSOLE STYLE */
         #console-output {
-            background: #1c1c1e;
-            color: #32d74b;
-            font-family: 'Courier New', Courier, monospace;
-            padding: 20px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            height: 300px;
-            overflow-y: auto;
-            margin-bottom: 30px;
-            line-height: 1.5;
+            background: #1c1c1e; color: #32d74b; font-family: 'Courier New', monospace;
+            padding: 20px; border-radius: 12px; font-size: 0.85rem; height: 300px;
+            overflow-y: auto; margin-bottom: 30px; line-height: 1.5;
         }
 
         .swipe-1 { transform: translateX(-100vw); }
         .swipe-2 { transform: translateX(-200vw); }
         .swipe-3 { transform: translateX(-300vw); }
 
+        .error-box { color: #ff3b30; background: #fff2f1; padding: 10px; border-radius: 8px; font-size: 0.8rem; margin-top: 10px; display: none; }
     </style>
 </head>
 <body>
 
 <div id="viewport">
     
-    <!-- PAGE 1: THE LANDING PAGE -->
+    <!-- PAGE 1: LANDING -->
     <div class="full-page landing-wrapper">
         <section class="hero">
-            <span class="label">Next-Gen Shopify Tool</span>
+            <span class="label">Proprietary Section Engine</span>
             <h1>ThemeGen AI</h1>
-            <p>Convert brand briefs into high-conversion, premium Shopify sections instantly.</p>
-            <button class="btn btn-black" onclick="showQuestionnaire()">Start Creating Themes</button>
+            <p>Your brand brief, transformed into a high-performance Shopify theme instantly.</p>
+            <button class="btn btn-black" onclick="showQuestionnaire()">Begin Onboarding</button>
         </section>
     </div>
 
-    <!-- PAGE 2: THE INTERACTIVE QUESTIONNAIRE -->
+    <!-- PAGE 2: QUESTIONNAIRE -->
     <div class="full-page app-page">
         <div class="form-container">
             <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+            
             <div class="loading-overlay" id="loader">
                 <div class="spinner"></div>
-                <div id="loader-title" style="font-size: 1.5rem; font-weight: 600;">Creative Director is thinking...</div>
-                <p id="loader-desc">Analyzing industry and choosing design system.</p>
+                <div id="loader-title" style="font-size: 1.4rem; font-weight: 700; color: var(--black);">Creative Director is Analyzing...</div>
+                <p id="loader-desc" style="color: var(--muted); max-width: 300px; margin-top: 10px;">Synthesizing brand identity and choosing design tokens.</p>
+                <div id="error-display" class="error-box"></div>
             </div>
             
             <form id="ai-generator-form">
-                <!-- STEP 1: IDENTITY -->
+                <!-- STEP 1 -->
                 <div class="step active" id="step1">
-                    <span class="label">Step 1 of 3: Identity</span>
-                    <h2 style="margin-bottom: 10px;">Brand Foundation</h2>
-                    <p style="color: var(--muted); margin-bottom: 30px; font-size: 0.95rem;">Tell us who you are or provide a pre-filled brief.</p>
+                    <span class="label">Step 1: Identity</span>
+                    <h2>Brand Foundation</h2>
+                    <p style="color: var(--muted); margin-bottom: 30px;">Upload a Jotform brief or fill manually.</p>
                     
                     <div class="upload-section">
-                        <label style="margin-bottom: 15px; color: var(--muted);">Use Brief Documents</label>
-                        <div class="upload-options">
+                        <div class="upload-options" style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
                             <button type="button" class="btn btn-black btn-sm" onclick="handleDownloadSample()">
-                                Download Sample Brief
+                                Download Template (.pdf)
                             </button>
-                            <div style="position: relative;">
-                                <input type="file" id="brief_upload" style="display: none;" onchange="handleFileUpload(event)">
-                                <button type="button" class="btn btn-outline btn-sm" style="border-color: var(--black); border-width: 2px;" onclick="document.getElementById('brief_upload').click()">
-                                    Upload Filled Brief
-                                </button>
-                            </div>
+                            <input type="file" id="brief_upload" style="display: none;" onchange="handleFileUpload(event)">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('brief_upload').click()">
+                                Upload Client Brief (COOPY)
+                            </button>
                         </div>
                     </div>
 
-                    <div class="section-divider">Or start to manually fill the questionnaire</div>
+                    <div class="section-divider">Manual Input</div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                         <div>
@@ -281,21 +213,15 @@
                                 <option value="beauty">Beauty & Skincare</option>
                                 <option value="fashion">Fashion & Apparel</option>
                                 <option value="tech">Consumer Tech</option>
-                                <option value="home">Home & Living</option>
                             </select>
                         </div>
                     </div>
 
-                    <label>Primary Business Objective</label>
+                    <label>Main Objective</label>
                     <select id="site_goal">
-                        <option value="" disabled selected>Select objective</option>
-                        <option value="direct_sales">Maximize GMV & Order Volume</option>
-                        <option value="brand_trust">Premium Identity & Credibility</option>
-                        <option value="social_commerce">TikTok/Meta Ad Conversion</option>
+                        <option value="direct_sales">Maximize GMV & Orders</option>
+                        <option value="brand_trust">Premium Identity</option>
                     </select>
-
-                    <label>Current Pain Point</label>
-                    <input type="text" id="pain_point" placeholder="e.g. High bounce rate on mobile, low trust factor">
 
                     <div class="nav-footer">
                         <button type="button" class="btn-back" onclick="exitToLanding()">Exit</button>
@@ -303,39 +229,20 @@
                     </div>
                 </div>
 
-                <!-- STEP 2: AESTHETICS -->
+                <!-- STEP 2 -->
                 <div class="step" id="step2">
-                    <span class="label">Step 2 of 3: Visuals</span>
-                    <h2 style="margin-bottom: 10px;">Design & Vibe</h2>
-                    <p style="color: var(--muted); margin-bottom: 30px; font-size: 0.95rem;">Define the look and feel of your custom sections.</p>
-
+                    <span class="label">Step 2: Visuals</span>
+                    <h2>Design & Vibe</h2>
                     <label>Visual Style Descriptor</label>
-                    <input type="text" id="vibe" placeholder="e.g. Minimalist luxury, Brutalist, Playful/Gen-Z">
+                    <input type="text" id="vibe" placeholder="e.g. Minimalist luxury, K-Beauty Aesthetic">
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div>
-                            <label>Typography Tone</label>
-                            <select id="typo_vibe">
-                                <option value="serif">Elegant Serif (Premium)</option>
-                                <option value="sans">Modern Sans (Clean)</option>
-                                <option value="bold">Heavy Display (Bold)</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label>Color Story</label>
-                            <input type="text" id="color_pref" placeholder="e.g. Earth tones, Neon, Mono">
-                        </div>
-                    </div>
+                    <label>Primary Hero Product</label>
+                    <input type="text" id="hero_product" placeholder="PDRN Serum">
 
-                    <label>Key Hero Product / USP</label>
-                    <input type="text" id="hero_product" placeholder="What is the star of the show?">
-
-                    <label>Brand Voice</label>
-                    <select id="voice">
-                        <option value="professional">Professional & Authoritative</option>
-                        <option value="friendly">Friendly & Relatable</option>
-                        <option value="luxury">Luxury & Exclusive</option>
-                        <option value="witty">Witty & Bold</option>
+                    <label>Typography Tone</label>
+                    <select id="typo_vibe">
+                        <option value="serif">Elegant Serif</option>
+                        <option value="sans">Modern Sans</option>
                     </select>
 
                     <div class="nav-footer">
@@ -344,29 +251,15 @@
                     </div>
                 </div>
 
-                <!-- STEP 3: CONTEXT & REFERENCES -->
+                <!-- STEP 3 -->
                 <div class="step" id="step3">
-                    <span class="label">Step 3 of 3: Context</span>
-                    <h2 style="margin-bottom: 10px;">Market Position</h2>
-                    <p style="color: var(--muted); margin-bottom: 30px; font-size: 0.95rem;">Provide context and inspiration for the AI to emulate.</p>
+                    <span class="label">Step 3: Market Position</span>
+                    <h2>Content & Context</h2>
+                    <label>Reference Sites</label>
+                    <textarea id="ref_sites" rows="3" placeholder="https://glossier.com"></textarea>
 
-                    <label>Target Audience (Avatar)</label>
-                    <textarea id="avatar" rows="2" placeholder="Describe your ideal customer in a sentence."></textarea>
-
-                    <label>Reference/Preference Websites (One per line)</label>
-                    <textarea id="ref_sites" rows="3" placeholder="https://apple.com&#10;https://glossier.com"></textarea>
-                    <p style="font-size: 0.75rem; color: var(--muted); margin-top: -15px; margin-bottom: 20px;">The AI will analyze these layouts to influence your site's structure.</p>
-
-                    <label>The Core Marketing "Hook"</label>
-                    <input type="text" id="hook" placeholder="What makes people stop scrolling?">
-
-                    <label>Must-Have Sections</label>
-                    <div id="section-checks" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px;">
-                        <div style="font-size: 0.85rem;"><input type="checkbox" value="Hero Slider" checked style="width: auto; margin-bottom: 0;"> Hero Slider</div>
-                        <div style="font-size: 0.85rem;"><input type="checkbox" value="Testimonials" checked style="width: auto; margin-bottom: 0;"> Testimonials</div>
-                        <div style="font-size: 0.85rem;"><input type="checkbox" value="Value Props" checked style="width: auto; margin-bottom: 0;"> Value Props</div>
-                        <div style="font-size: 0.85rem;"><input type="checkbox" value="Comparison Table" style="width: auto; margin-bottom: 0;"> Comparison Table</div>
-                    </div>
+                    <label>Core Marketing Hook</label>
+                    <input type="text" id="hook" placeholder="3% PDRN vs standard 0.5%">
 
                     <div class="nav-footer">
                         <button type="button" class="btn-back" onclick="moveStep(2)">Back</button>
@@ -377,75 +270,76 @@
         </div>
     </div>
 
-    <!-- PAGE 3: THE AI PROPOSAL -->
+    <!-- PAGE 3: PROPOSAL -->
     <div class="full-page app-page">
         <div class="form-container">
-            <span class="label">AI Proposal & Strategy</span>
-            <h2 id="prop-brand">Project Brief Acknowledged.</h2>
-            <p>Based on your directives and reference sites, here is the proposed build plan.</p>
-
+            <span class="label">AI Strategy Analysis</span>
+            <h2 id="prop-brand">Strategy Brief</h2>
             <div class="proposal-grid">
                 <div>
-                    <label>Typography Pairing</label>
+                    <label>Identity Tokens</label>
                     <div style="padding: 15px; border: 1px solid var(--silver); border-radius: 12px; margin-bottom: 20px;">
-                        <div id="prop-font-head" style="font-size: 1.5rem; font-weight: 700;">Heading Font</div>
-                        <div id="prop-font-body" style="font-size: 0.9rem; color: var(--muted);">Body Font</div>
+                        <div id="prop-font-head" style="font-size: 1.4rem; font-weight: 700;">Loading...</div>
+                        <div id="prop-font-body" style="font-size: 0.85rem; color: var(--muted);">Sans-Serif Secondary</div>
                     </div>
-
-                    <label>Color Palette</label>
+                    <label>Brand Palette</label>
                     <div id="palette-list"></div>
                 </div>
                 <div>
-                    <label>Reference Analysis</label>
+                    <label>Competitive Analysis</label>
                     <div id="ref-analysis" style="font-size: 0.85rem; background: #f9f9fb; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid var(--black);">
-                        Detecting layout patterns from provided URLs...
                     </div>
-                    <label>Plan of Attack</label>
+                    <label>Section Build-Out</label>
                     <ul id="build-plan" style="line-height: 1.8; font-size: 0.85rem;"></ul>
                 </div>
             </div>
-
-            <div class="nav-footer" style="margin-top: 40px; border-top: 1px solid var(--silver); padding-top: 20px;">
-                <button type="button" class="btn-back" onclick="showQuestionnaire()">Edit Brief</button>
+            <div class="nav-footer">
+                <button type="button" class="btn-back" onclick="showQuestionnaire()">Edit</button>
                 <button type="button" class="btn btn-black" onclick="startGeneration()">Approve & Build</button>
             </div>
         </div>
     </div>
 
-    <!-- PAGE 4: THE GENERATION CONSOLE -->
+    <!-- PAGE 4: CONSOLE -->
     <div class="full-page app-page">
-        <div class="form-container" style="max-width: 1000px;">
+        <div class="form-container">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                <div>
-                    <span class="label">Building Theme Engine...</span>
-                    <h2 id="gen-status">Generating layout/theme.liquid</h2>
-                </div>
+                <h2 id="gen-status">Compiling Theme Assets</h2>
                 <div id="gen-percent" style="font-size: 2rem; font-weight: 700; color: var(--primary);">0%</div>
             </div>
-
-            <div id="console-output">
-                > Initializing Senior Developer Prompt Stack...<br>
-                > Configuring Splide.js & Lucide CDN links...<br>
-            </div>
-
+            <div id="console-output"></div>
             <div class="nav-footer">
-                <div id="gen-spinner" class="spinner" style="width: 32px; height: 32px; margin-bottom: 0;"></div>
+                <div id="gen-spinner" class="spinner" style="width: 30px; height: 30px; margin-bottom: 0;"></div>
                 <button type="button" id="btn-download" class="btn btn-black" style="display: none;" onclick="location.reload()">Download Theme (.zip)</button>
-                <button type="button" id="btn-preview-link" class="btn btn-outline" style="display: none;">View Live Preview</button>
             </div>
         </div>
     </div>
-
 </div>
 
 <script>
-    const apiKey = ""; // Runtime provides this
+    const apiKey = ""; // API Key required for real generation
+
+    function showLoader(title, desc) {
+        const l = document.getElementById('loader');
+        l.style.display = 'flex';
+        document.getElementById('loader-title').innerText = title;
+        document.getElementById('loader-desc').innerText = desc;
+        document.getElementById('error-display').style.display = 'none';
+    }
+
+    function hideLoader() {
+        document.getElementById('loader').style.display = 'none';
+    }
 
     async function callGemini(prompt, isJson = false) {
+        if (!apiKey) {
+            throw new Error("Missing API Key. Please add your key to the code to enable AI features.");
+        }
+        
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
         const payload = {
             contents: [{ parts: [{ text: prompt }] }],
-            systemInstruction: { parts: [{ text: "You are a world-class Shopify Creative Director. Provide strategic design choices based on user briefs. Be concise but specific." }] }
+            systemInstruction: { parts: [{ text: "You are a Shopify Creative Director. Provide strategic design choices. Respond in JSON if requested." }] }
         };
 
         if (isJson) {
@@ -456,13 +350,7 @@
                     properties: {
                         headingFont: { type: "STRING" },
                         bodyFont: { type: "STRING" },
-                        colors: { 
-                            type: "ARRAY", 
-                            items: { 
-                                type: "OBJECT", 
-                                properties: { name: { type: "STRING" }, hex: { type: "STRING" } } 
-                            } 
-                        },
+                        colors: { type: "ARRAY", items: { type: "OBJECT", properties: { name: { type: "STRING" }, hex: { type: "STRING" } } } },
                         refAnalysis: { type: "STRING" },
                         buildSteps: { type: "ARRAY", items: { type: "STRING" } }
                     }
@@ -470,170 +358,99 @@
             };
         }
 
-        let retries = 5;
-        let delay = 1000;
-
-        for (let i = 0; i < retries; i++) {
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) throw new Error('API Error');
-                const result = await response.json();
-                return result.candidates?.[0]?.content?.parts?.[0]?.text;
-            } catch (e) {
-                if (i === retries - 1) throw e;
-                await new Promise(r => setTimeout(r, delay));
-                delay *= 2;
-            }
-        }
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        if (!response.ok) throw new Error(`Model Error: ${response.statusText}`);
+        const result = await response.json();
+        return result.candidates?.[0]?.content?.parts?.[0]?.text;
     }
 
-    function showQuestionnaire() {
-        document.getElementById('viewport').className = 'swipe-1';
-        window.scrollTo(0,0);
-    }
-
-    function exitToLanding() {
-        document.getElementById('viewport').className = '';
-    }
-
-    function moveStep(stepNum) {
-        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-        document.getElementById('step' + stepNum).classList.add('active');
-        document.getElementById('progress').style.width = (stepNum / 3) * 100 + '%';
-    }
-
-    // FUNCTIONAL DOWNLOAD SIMULATION
     function handleDownloadSample() {
-        const text = "ThemeGen Brand Brief Template\n\n1. Brand Identity\n2. Design Preferences\n3. Market Positioning\n4. Technical Requirements";
+        const text = "COOPY Brand Identity Document...";
         const blob = new Blob([text], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url;
-        a.download = 'ThemeGen_Brand_Brief_Template.pdf';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        a.href = url; a.download = 'COOPY_Brief_Brief.pdf';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
 
-    function handleFileUpload(event) {
-        const file = event.target.files[0];
-        if (file) {
-            document.getElementById('loader').style.display = 'flex';
-            document.getElementById('loader-title').innerText = "Processing Document...";
-            document.getElementById('loader-desc').innerText = "Extracting brand identity and objectives...";
-            
-            setTimeout(() => {
-                document.getElementById('brand_name').value = "COOPY";
-                document.getElementById('site_goal').value = "direct_sales";
-                document.getElementById('vibe').value = "Premium, High-Conversion TikTok Shop Identity";
-                document.getElementById('hero_product').value = "Best-selling Skin Care Bundle";
-                document.getElementById('avatar').value = "Direct-to-consumer shoppers looking for premium aesthetics on social platforms.";
-                document.getElementById('hook').value = "Premium quality accessible via TikTok Shop integration.";
-                document.getElementById('ref_sites').value = "https://glossier.com\nhttps://fentybeauty.com";
-                
-                document.getElementById('loader').style.display = 'none';
-                moveStep(2);
-            }, 2000);
-        }
+    function handleFileUpload(e) {
+        showLoader("Parsing Brief...", "Reading Jotform submission for COOPY...");
+        setTimeout(() => {
+            document.getElementById('brand_name').value = "COOPY";
+            document.getElementById('industry').value = "beauty";
+            document.getElementById('vibe').value = "High-end K-Beauty / Rejuran Inspiration";
+            document.getElementById('hero_product').value = "PDRN Serum (3% Concentration)";
+            document.getElementById('hook').value = "Visible skin transformation (PDRN 3% Formula)";
+            document.getElementById('ref_sites').value = "https://rejuran.com\nhttps://melaxin.com";
+            hideLoader();
+            moveStep(2);
+        }, 1500);
     }
 
     async function triggerProposal() {
-        const formData = {
-            brand: document.getElementById('brand_name').value || "Unnamed Brand",
-            industry: document.getElementById('industry').value,
-            goal: document.getElementById('site_goal').value,
-            vibe: document.getElementById('vibe').value,
-            typo: document.getElementById('typo_vibe').value,
-            color: document.getElementById('color_pref').value,
-            refs: document.getElementById('ref_sites').value,
-            voice: document.getElementById('voice').value,
-            avatar: document.getElementById('avatar').value,
-            hook: document.getElementById('hook').value,
-            sections: Array.from(document.querySelectorAll('#section-checks input:checked')).map(i => i.value)
-        };
-
-        document.getElementById('loader').style.display = 'flex';
-        document.getElementById('loader-title').innerText = "AI Creative Director is thinking...";
-        document.getElementById('loader-desc').innerText = "Analyzing color choices and reference sites...";
-
-        const prompt = `Generate a Shopify design proposal based on this brief:
-        Brand: ${formData.brand} in ${formData.industry}. 
-        Goal: ${formData.goal}.
-        Aesthetic: ${formData.vibe} with a ${formData.color} color palette and ${formData.typo} typography.
-        References: ${formData.refs}
-        Target: ${formData.avatar}
-        Hook: ${formData.hook}
-        Voice: ${formData.voice}
-        Sections requested: ${formData.sections.join(', ')}
-
-        Analyze the 'color palette' text specifically to generate actual Hex codes that match the vibe.
-        Analyze reference sites to suggest a plan.`;
+        showLoader("AI Strategist thinking...", "Crafting your brand identity tokens...");
+        
+        const brand = document.getElementById('brand_name').value;
+        const prompt = `Create a Shopify theme strategy for ${brand}. Vibe: ${document.getElementById('vibe').value}. Industry: Beauty. Refs: ${document.getElementById('ref_sites').value}`;
 
         try {
-            const responseText = await callGemini(prompt, true);
-            const strategy = JSON.parse(responseText);
-
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('viewport').className = 'swipe-2';
+            const res = await callGemini(prompt, true);
+            const data = JSON.parse(res);
             
-            document.getElementById('prop-brand').innerText = formData.brand + " Build Plan";
-            document.getElementById('prop-font-head').innerText = strategy.headingFont;
-            document.getElementById('prop-font-body').innerText = strategy.bodyFont;
-            document.getElementById('ref-analysis').innerText = strategy.refAnalysis;
-            
-            document.getElementById('palette-list').innerHTML = strategy.colors.map(c => `
-                <div class="palette-item">
-                    <span class="color-dot" style="background:${c.hex}"></span>
-                    <b>${c.name}:</b> ${c.hex}
-                </div>
+            document.getElementById('prop-brand').innerText = brand + " Design Strategy";
+            document.getElementById('prop-font-head').innerText = data.headingFont;
+            document.getElementById('ref-analysis').innerText = data.refAnalysis;
+            document.getElementById('palette-list').innerHTML = data.colors.map(c => `
+                <div class="palette-item"><span class="color-dot" style="background:${c.hex}"></span><b>${c.name}</b></div>
             `).join('');
+            document.getElementById('build-plan').innerHTML = data.buildSteps.map(s => `<li>${s}</li>`).join('');
 
-            document.getElementById('build-plan').innerHTML = strategy.buildSteps.map(item => `<li>${item}</li>`).join('');
-        } catch (error) {
-            document.getElementById('loader').style.display = 'none';
-            alert("The Creative Director is busy right now. Please try again in a moment.");
+            hideLoader();
+            document.getElementById('viewport').className = 'swipe-2';
+        } catch (err) {
+            const errBox = document.getElementById('error-display');
+            errBox.innerText = `Error: ${err.message}. (Did you add the API Key?)`;
+            errBox.style.display = 'block';
         }
+    }
+
+    function showQuestionnaire() { document.getElementById('viewport').className = 'swipe-1'; }
+    function exitToLanding() { document.getElementById('viewport').className = ''; }
+    function moveStep(s) {
+        document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+        document.getElementById('step' + s).classList.add('active');
+        document.getElementById('progress').style.width = (s/3)*100 + '%';
     }
 
     function startGeneration() {
         document.getElementById('viewport').className = 'swipe-3';
-        const consoleEl = document.getElementById('console-output');
-        const statusEl = document.getElementById('gen-status');
-        const percentEl = document.getElementById('gen-percent');
-        const genSpinner = document.getElementById('gen-spinner');
-        
         const logs = [
-            { msg: "> Scaffold: Injecting base.css resets (62.5% scale)...", status: "Configuring CSS", p: 15 },
-            { msg: "> Scaffold: Setting up Lucide icons snippet...", status: "Configuring Liquid", p: 30 },
-            { msg: "> Section: Writing hero-slider.liquid with Splide.js...", status: "Building Hero Section", p: 50 },
-            { msg: "> Logic: Applying premium 5rem typography constraints...", status: "Styling Components", p: 65 },
-            { msg: "> Section: Crafting feature-grid.liquid (AJAX enabled)...", status: "Building Grid", p: 85 },
-            { msg: "> Finalizing: Packaging 5-file blank theme scaffold...", status: "Finalizing Build", p: 95 },
-            { msg: "> SUCCESS: Theme engine ready for deployment.", status: "Build Complete", p: 100 }
+            "> Initializing Liquid Compiler...",
+            "> Fetching Splide.js for Product Carousels...",
+            "> Generating layout/theme.liquid...",
+            "> Building section: pdrn-comparison-table.liquid...",
+            "> Injecting Tailwind configuration...",
+            "> Finalizing Zip Packaging..."
         ];
-
         let i = 0;
         const interval = setInterval(() => {
-            if (i < logs.length) {
-                consoleEl.innerHTML += logs[i].msg + "<br>";
-                statusEl.innerText = logs[i].status;
-                percentEl.innerText = logs[i].p + "%";
-                consoleEl.scrollTop = consoleEl.scrollHeight;
+            if(i < logs.length) {
+                document.getElementById('console-output').innerHTML += logs[i] + "<br>";
+                document.getElementById('gen-percent').innerText = Math.floor((i/logs.length)*100) + "%";
                 i++;
             } else {
                 clearInterval(interval);
-                genSpinner.style.display = 'none';
+                document.getElementById('gen-percent').innerText = "100%";
+                document.getElementById('gen-spinner').style.display = 'none';
                 document.getElementById('btn-download').style.display = 'block';
-                document.getElementById('btn-preview-link').style.display = 'block';
             }
-        }, 800);
+        }, 1000);
     }
 </script>
-
 </body>
 </html>
