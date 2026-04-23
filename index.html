@@ -68,7 +68,7 @@
         .btn-black { background: var(--black); color: #fff; }
         .btn-black:hover { transform: scale(1.03); background: #333; }
         .btn-outline { background: transparent; border: 1px solid var(--silver); color: var(--text); }
-        .btn-sm { padding: 10px 20px; font-size: 0.85rem; }
+        .btn-sm { padding: 12px 24px; font-size: 0.85rem; border-radius: 12px; }
 
         /* LANDING PAGE SECTIONS */
         .landing-wrapper { overflow-y: auto; height: 100vh; }
@@ -136,12 +136,38 @@
         .progress-fill { height: 100%; background: var(--black); width: 33%; transition: width 0.4s ease; }
 
         /* UPLOAD AREA */
+        .upload-section {
+            background: #f9f9fb;
+            border: 2px dashed var(--silver);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        .section-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 30px 0;
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .section-divider::before, .section-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--silver);
+        }
+        .section-divider:not(:empty)::before { margin-right: .5em; }
+        .section-divider:not(:empty)::after { margin-left: .5em; }
+
         .upload-options {
             display: flex;
             gap: 15px;
-            margin-bottom: 30px;
-            padding-bottom: 30px;
-            border-bottom: 1px solid var(--silver);
+            justify-content: center;
+            margin-top: 15px;
         }
 
         /* PROPOSAL & GENERATION VIEW STYLES */
@@ -203,18 +229,23 @@
                     <span class="label">Step 1 of 3</span>
                     <h2>Identity & Focus</h2>
                     
-                    <!-- NEW UPLOAD/DOWNLOAD BUTTONS -->
-                    <div class="upload-options">
-                        <button type="button" class="btn btn-outline btn-sm" onclick="handleDownloadSample()">
-                            Download Sample Brief
-                        </button>
-                        <div style="position: relative;">
-                            <input type="file" id="brief_upload" style="display: none;" onchange="handleFileUpload(event)">
-                            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('brief_upload').click()">
-                                Upload Filled Brief
+                    <!-- ENHANCED UPLOAD/DOWNLOAD SECTION -->
+                    <div class="upload-section">
+                        <label style="margin-bottom: 15px; color: var(--muted);">Use Brief Documents</label>
+                        <div class="upload-options">
+                            <button type="button" class="btn btn-black btn-sm" onclick="handleDownloadSample()">
+                                Download Sample Brief
                             </button>
+                            <div style="position: relative;">
+                                <input type="file" id="brief_upload" style="display: none;" onchange="handleFileUpload(event)">
+                                <button type="button" class="btn btn-outline btn-sm" style="border-color: var(--black); border-width: 2px;" onclick="document.getElementById('brief_upload').click()">
+                                    Upload Filled Brief
+                                </button>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="section-divider">Or start to manually fill the questionnaire</div>
 
                     <label>Brand Name</label>
                     <input type="text" id="brand_name" placeholder="e.g. Acme Co.">
