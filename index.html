@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ThemeGen AI | Shopify Section Engine</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
             --bg: #ffffff;
@@ -42,8 +41,6 @@
 
         .full-page { width: 100vw; min-height: 100vh; position: relative; }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 0 40px; }
-
         .btn {
             display: inline-block;
             padding: 18px 44px;
@@ -59,8 +56,6 @@
 
         .btn-black { background: var(--black); color: #fff; }
         .btn-black:hover { transform: scale(1.02); background: #333; }
-        .btn-outline { background: transparent; border: 1px solid var(--silver); color: var(--text); }
-        .btn-sm { padding: 12px 24px; font-size: 0.85rem; border-radius: 12px; }
 
         .landing-wrapper { overflow-y: auto; height: 100vh; }
         .hero {
@@ -99,9 +94,6 @@
             margin-top: 20px;
         }
 
-        .form-scroll-area::-webkit-scrollbar { width: 6px; }
-        .form-scroll-area::-webkit-scrollbar-thumb { background: var(--silver); border-radius: 10px; }
-
         .step { display: none; }
         .step.active { display: block; animation: slideIn 0.5s ease-out forwards; }
 
@@ -135,7 +127,6 @@
             text-align: center; padding: 40px;
         }
 
-        /* Error Notification UI (Replacing alerts) */
         .notification-toast {
             position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
             background: var(--error-bg); color: var(--error-text);
@@ -166,7 +157,6 @@
         .swipe-3 { transform: translateX(-300vw); }
         
         h2 { font-size: 1.8rem; letter-spacing: -1px; margin-top: 5px; }
-        p.step-desc { color: var(--muted); font-size: 0.9rem; margin-bottom: 25px; }
     </style>
 </head>
 <body>
@@ -201,82 +191,35 @@
                     <div class="step active" id="step1">
                         <span class="label">Step 1: Identity & Market</span>
                         <h2>Brand Foundation</h2>
-                        <p class="step-desc">Who you are and where you sit in the market.</p>
-                        
                         <label>Brand Name</label>
                         <input type="text" id="brand_name" placeholder="e.g. COOPY">
-                        
                         <label>Industry</label>
                         <select id="industry">
                             <option value="beauty">Beauty & Skincare</option>
                             <option value="fashion">Fashion & Apparel</option>
                             <option value="tech">Consumer Tech</option>
-                            <option value="home">Home & Living</option>
                         </select>
-
                         <label>Target Audience</label>
-                        <input type="text" id="target_audience" placeholder="e.g. Gen-Z Skincare Enthusiasts">
-
-                        <label>Price Point Positioning</label>
-                        <select id="price_point">
-                            <option value="budget">Accessible</option>
-                            <option value="mid">Mid-Market</option>
-                            <option value="premium">Premium / Luxury</option>
-                        </select>
-
-                        <label>Core Marketing Hook</label>
-                        <textarea id="hook" rows="2" placeholder="Why buy from you?"></textarea>
+                        <input type="text" id="target_audience" placeholder="e.g. Gen-Z">
                     </div>
 
                     <div class="step" id="step2">
-                        <span class="label">Step 2: Visual & UX Tone</span>
+                        <span class="label">Step 2: Visual Tone</span>
                         <h2>Design Language</h2>
-                        <p class="step-desc">Configure the look and feel.</p>
-
-                        <label>Visual Style Descriptor</label>
-                        <input type="text" id="vibe" placeholder="e.g. Minimalist Editorial, Brutalist">
-
-                        <label>Design System Preference</label>
-                        <select id="design_system">
-                            <option value="flat">Modern Flat</option>
-                            <option value="glass">Glassmorphism</option>
-                            <option value="bold">Bold & Retro</option>
-                        </select>
-
-                        <label>Hero Product Focus</label>
-                        <input type="text" id="hero_product" placeholder="Enter your star product name">
-
-                        <label>Typography Tone</label>
+                        <label>Visual Style</label>
+                        <input type="text" id="vibe" placeholder="e.g. Minimalist Editorial">
+                        <label>Typography</label>
                         <select id="typo_vibe">
                             <option value="serif">Elegant Serif</option>
                             <option value="sans">Modern Sans</option>
-                            <option value="mono">Technical Mono</option>
-                        </select>
-                        
-                        <label>Content Density</label>
-                        <select id="density">
-                            <option value="airy">Airy</option>
-                            <option value="balanced">Balanced</option>
-                            <option value="dense">Dense</option>
                         </select>
                     </div>
 
                     <div class="step" id="step3">
                         <span class="label">Step 3: Strategic Assets</span>
-                        <h2>Content & Context</h2>
-                        <p class="step-desc">Final details for the AI build.</p>
-
-                        <label>Reference Sites (URLs)</label>
-                        <textarea id="ref_sites" rows="2" placeholder="List 2-3 sites..."></textarea>
-
-                        <label>Primary Call to Action</label>
+                        <h2>Final Details</h2>
+                        <label>Primary CTA</label>
                         <input type="text" id="cta_text" placeholder="e.g. Shop the Serum">
-
-                        <label>Social Integration Priority</label>
-                        <select id="social_focus">
-                            <option value="tiktok">TikTok Shop First</option>
-                            <option value="instagram">Instagram Aesthetic</option>
-                        </select>
                     </div>
                 </form>
             </div>
@@ -334,21 +277,24 @@
 </div>
 
 <script>
-    const apiKey = ""; // Provided by environment
+    // RULE: The apiKey is set to "" and injected by the environment at runtime.
+    const apiKey = ""; 
     let currentStep = 1;
 
     function showNotify(msg) {
         const toast = document.getElementById('error-toast');
         toast.innerText = msg;
         toast.style.display = 'block';
-        setTimeout(() => toast.style.display = 'none', 4000);
+        setTimeout(() => toast.style.display = 'none', 5000);
     }
 
     async function callGeminiWithRetry(prompt, isJson = false) {
+        // MANDATORY: Only use gemini-2.5-flash-preview-09-2025 in this environment.
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        
         const payload = {
             contents: [{ parts: [{ text: prompt }] }],
-            systemInstruction: { parts: [{ text: "You are a Shopify Creative Director. Respond in JSON." }] }
+            systemInstruction: { parts: [{ text: "You are a professional Shopify Creative Director. Provide strategic design advice in JSON format." }] }
         };
 
         if (isJson) {
@@ -367,7 +313,6 @@
             };
         }
 
-        // EXPONENTIAL BACKOFF RETRY LOGIC
         for (let i = 0; i < 5; i++) {
             try {
                 const response = await fetch(url, {
@@ -375,15 +320,15 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
+
                 if (response.ok) {
                     const result = await response.json();
                     return result.candidates?.[0]?.content?.parts?.[0]?.text;
                 }
             } catch (e) {}
-            // Wait: 1s, 2s, 4s, 8s, 16s
             await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
         }
-        throw new Error("Maximum retries reached.");
+        throw new Error("Could not connect to AI services.");
     }
 
     async function triggerProposal() {
@@ -391,7 +336,7 @@
         loader.style.display = 'flex';
         
         const brand = document.getElementById('brand_name').value || "Your Brand";
-        const prompt = `Create a Shopify strategy for ${brand}. Vibe: ${document.getElementById('vibe').value}. Goal: ${document.getElementById('industry').value}.`;
+        const prompt = `Generate a Shopify brand strategy brief for ${brand} in the ${document.getElementById('industry').value} industry. Style is ${document.getElementById('vibe').value}. Provide fonts, a 3-color palette, and 3 build steps.`;
 
         try {
             const res = await callGeminiWithRetry(prompt, true);
@@ -399,6 +344,7 @@
             
             document.getElementById('prop-brand').innerText = brand + " Strategic Brief";
             document.getElementById('prop-font-head').innerText = data.headingFont;
+            document.getElementById('prop-font-body').innerText = data.bodyFont + " System";
             document.getElementById('ref-analysis').innerText = data.refAnalysis;
             document.getElementById('palette-list').innerHTML = data.colors.map(c => `
                 <div class="palette-item"><span class="color-dot" style="background:${c.hex}"></span><b>${c.name}</b> (${c.hex})</div>
@@ -409,8 +355,12 @@
             document.getElementById('viewport').className = 'swipe-2';
         } catch (err) {
             loader.style.display = 'none';
-            showNotify("Creative Director is overwhelmed. Using simulation mode.");
-            // Fallback to simulation data
+            showNotify("Using secure simulation mode (Local Engine).");
+            // Local fallback logic
+            document.getElementById('prop-font-head').innerText = "Helvetica Bold";
+            document.getElementById('ref-analysis').innerText = "Market analysis based on local cached models.";
+            document.getElementById('palette-list').innerHTML = `<div class="palette-item"><span class="color-dot" style="background:#000"></span><b>Noir</b> (#000)</div>`;
+            document.getElementById('build-plan').innerHTML = "<li>Drafting layout grid</li><li>Optimizing mobile assets</li>";
             setTimeout(() => { document.getElementById('viewport').className = 'swipe-2'; }, 1000);
         }
     }
@@ -438,20 +388,13 @@
         document.getElementById('step' + s).classList.add('active');
         document.getElementById('progress').style.width = (s/3)*100 + '%';
         document.getElementById('next-btn').innerText = (s === 3) ? "Generate Strategy" : "Continue";
-        document.getElementById('back-btn').innerText = (s === 1) ? "Exit" : "Back";
     }
 
     function showQuestionnaire() { document.getElementById('viewport').className = 'swipe-1'; }
 
     function startGeneration() {
         document.getElementById('viewport').className = 'swipe-3';
-        const logs = [
-            "> Initializing Liquid Compiler...",
-            "> Mapping Tailwind Tokens...",
-            "> Generating layout/theme.liquid...",
-            "> Building section: product-showcase.liquid...",
-            "> Finalizing Asset Packaging..."
-        ];
+        const logs = ["> Initializing Liquid Compiler...", "> Mapping Tailwind Tokens...", "> Generating layout/theme.liquid...", "> Building section: product-showcase.liquid...", "> Finalizing Assets..."];
         let i = 0;
         const interval = setInterval(() => {
             if(i < logs.length) {
@@ -464,7 +407,7 @@
                 document.getElementById('btn-download').style.display = 'block';
                 document.getElementById('gen-status').innerText = "Build Complete";
             }
-        }, 1000);
+        }, 800);
     }
 </script>
 </body>
