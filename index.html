@@ -176,11 +176,7 @@
             <span class="label">Proprietary Section Engine</span>
             <h1>ThemeGen AI</h1>
             <p>High-performance Shopify themes generated from deep brand analysis.</p>
-            <div class="import-export-row">
-                <button class="btn btn-black" onclick="showQuestionnaire()">Begin Onboarding</button>
-                <button class="btn btn-outline" onclick="document.getElementById('import-file').click()">Upload Brief</button>
-            </div>
-            <input type="file" id="import-file" style="display: none" accept=".json" onchange="handleImport(event)">
+            <button class="btn btn-black" onclick="showQuestionnaire()">Begin Onboarding</button>
         </section>
     </div>
 
@@ -198,9 +194,18 @@
             <div class="form-scroll-area">
                 <form id="ai-generator-form">
                     <div class="step active" id="step1">
-                        <span class="label">Step 1: Identity & Market</span>
-                        <h2>Brand Foundation</h2>
-                        <p class="step-desc">Establish your core brand identity and competitive market positioning.</p>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                            <div>
+                                <span class="label">Step 1: Identity & Market</span>
+                                <h2>Brand Foundation</h2>
+                                <p class="step-desc">Establish your core brand identity and competitive market positioning.</p>
+                            </div>
+                            <div class="import-export-row" style="margin-bottom: 0;">
+                                <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('import-file').click()">Upload Brief</button>
+                                <button type="button" class="btn btn-outline btn-sm" onclick="exportBrief()">Download Brief</button>
+                            </div>
+                            <input type="file" id="import-file" style="display: none" accept=".json" onchange="handleImport(event)">
+                        </div>
                         
                         <label>Brand Name</label>
                         <input type="text" id="brand_name" placeholder="e.g. COOPY">
@@ -283,7 +288,6 @@
             <div class="nav-footer">
                 <button type="button" class="btn-back" id="back-btn" onclick="prevStep()">Exit</button>
                 <div style="display: flex; gap: 10px;">
-                    <button type="button" class="btn btn-outline btn-sm" onclick="exportBrief()">Download Brief</button>
                     <button type="button" class="btn btn-black" id="next-btn" onclick="nextStep()">Continue</button>
                 </div>
             </div>
@@ -452,7 +456,6 @@
 
     function showQuestionnaire() { document.getElementById('viewport').className = 'swipe-1'; }
 
-    // RESTORED IMPORT/EXPORT
     function exportBrief() {
         const formData = {
             brand_name: document.getElementById('brand_name').value,
