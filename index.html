@@ -56,6 +56,8 @@
 
         .btn-black { background: var(--black); color: #fff; }
         .btn-black:hover { transform: scale(1.02); background: #333; }
+        .btn-outline { background: transparent; border: 1px solid var(--silver); color: var(--text); }
+        .btn-sm { padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; }
 
         .landing-wrapper { overflow-y: auto; height: 100vh; }
         .hero {
@@ -156,7 +158,10 @@
         .swipe-2 { transform: translateX(-200vw); }
         .swipe-3 { transform: translateX(-300vw); }
         
-        h2 { font-size: 1.8rem; letter-spacing: -1px; margin-top: 5px; }
+        h2 { font-size: 1.8rem; letter-spacing: -1px; margin-top: 5px; margin-bottom: 5px; }
+        p.step-desc { color: var(--muted); font-size: 0.9rem; margin-bottom: 25px; line-height: 1.4; }
+
+        .import-export-row { display: flex; gap: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -171,7 +176,11 @@
             <span class="label">Proprietary Section Engine</span>
             <h1>ThemeGen AI</h1>
             <p>High-performance Shopify themes generated from deep brand analysis.</p>
-            <button class="btn btn-black" onclick="showQuestionnaire()">Begin Onboarding</button>
+            <div class="import-export-row">
+                <button class="btn btn-black" onclick="showQuestionnaire()">Begin Onboarding</button>
+                <button class="btn btn-outline" onclick="document.getElementById('import-file').click()">Upload Brief</button>
+            </div>
+            <input type="file" id="import-file" style="display: none" accept=".json" onchange="handleImport(event)">
         </section>
     </div>
 
@@ -191,42 +200,92 @@
                     <div class="step active" id="step1">
                         <span class="label">Step 1: Identity & Market</span>
                         <h2>Brand Foundation</h2>
+                        <p class="step-desc">Establish your core brand identity and competitive market positioning.</p>
+                        
                         <label>Brand Name</label>
                         <input type="text" id="brand_name" placeholder="e.g. COOPY">
+                        
                         <label>Industry</label>
                         <select id="industry">
                             <option value="beauty">Beauty & Skincare</option>
                             <option value="fashion">Fashion & Apparel</option>
                             <option value="tech">Consumer Tech</option>
+                            <option value="home">Home & Living</option>
                         </select>
+
                         <label>Target Audience</label>
-                        <input type="text" id="target_audience" placeholder="e.g. Gen-Z">
+                        <input type="text" id="target_audience" placeholder="e.g. Gen-Z Skincare Enthusiasts">
+
+                        <label>Price Point Positioning</label>
+                        <select id="price_point">
+                            <option value="budget">Accessible / Value</option>
+                            <option value="mid">Mid-Market Standard</option>
+                            <option value="premium">Premium / Luxury</option>
+                        </select>
+
+                        <label>Core Marketing Hook</label>
+                        <textarea id="hook" rows="2" placeholder="The primary reason customers choose you over competitors."></textarea>
                     </div>
 
                     <div class="step" id="step2">
-                        <span class="label">Step 2: Visual Tone</span>
+                        <span class="label">Step 2: Visual & UX Tone</span>
                         <h2>Design Language</h2>
-                        <label>Visual Style</label>
-                        <input type="text" id="vibe" placeholder="e.g. Minimalist Editorial">
-                        <label>Typography</label>
+                        <p class="step-desc">Configure the aesthetic design tokens and user experience flow.</p>
+
+                        <label>Visual Style Descriptor</label>
+                        <input type="text" id="vibe" placeholder="e.g. Minimalist Editorial, Bold Brutalist, Organic Soft">
+
+                        <label>Design System Preference</label>
+                        <select id="design_system">
+                            <option value="flat">Modern Flat (Apple Style)</option>
+                            <option value="glass">Glassmorphism (Frosted UI)</option>
+                            <option value="bold">Bold & Retro (Neo-Brutalism)</option>
+                        </select>
+
+                        <label>Hero Product Focus</label>
+                        <input type="text" id="hero_product" placeholder="The flagship product the theme should spotlight.">
+
+                        <label>Typography Tone</label>
                         <select id="typo_vibe">
-                            <option value="serif">Elegant Serif</option>
-                            <option value="sans">Modern Sans</option>
+                            <option value="serif">Elegant Serif (Editorial/Luxury)</option>
+                            <option value="sans">Modern Sans (Clean/Tech)</option>
+                            <option value="mono">Technical Mono (Modern/Alternative)</option>
+                        </select>
+                        
+                        <label>Content Density</label>
+                        <select id="density">
+                            <option value="airy">Airy (High Whitespace)</option>
+                            <option value="balanced">Balanced (Standard Ecom)</option>
+                            <option value="dense">Dense (Information Rich)</option>
                         </select>
                     </div>
 
                     <div class="step" id="step3">
                         <span class="label">Step 3: Strategic Assets</span>
-                        <h2>Final Details</h2>
-                        <label>Primary CTA</label>
-                        <input type="text" id="cta_text" placeholder="e.g. Shop the Serum">
+                        <h2>Content & Context</h2>
+                        <p class="step-desc">Final details to help the AI contextualize your generated code.</p>
+
+                        <label>Reference Sites (URLs)</label>
+                        <textarea id="ref_sites" rows="2" placeholder="List 2-3 brands you admire for their UI/UX."></textarea>
+
+                        <label>Primary Call to Action</label>
+                        <input type="text" id="cta_text" placeholder="e.g. Join the Movement, Shop the Drop">
+
+                        <label>Social Integration Priority</label>
+                        <select id="social_focus">
+                            <option value="tiktok">TikTok Shop First (Video-heavy)</option>
+                            <option value="instagram">Instagram Aesthetic (Static Grids)</option>
+                        </select>
                     </div>
                 </form>
             </div>
 
             <div class="nav-footer">
                 <button type="button" class="btn-back" id="back-btn" onclick="prevStep()">Exit</button>
-                <button type="button" class="btn btn-black" id="next-btn" onclick="nextStep()">Continue</button>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="exportBrief()">Download Brief</button>
+                    <button type="button" class="btn btn-black" id="next-btn" onclick="nextStep()">Continue</button>
+                </div>
             </div>
         </div>
     </div>
@@ -277,7 +336,6 @@
 </div>
 
 <script>
-    // RULE: The apiKey is set to "" and injected by the environment at runtime.
     const apiKey = ""; 
     let currentStep = 1;
 
@@ -289,7 +347,6 @@
     }
 
     async function callGeminiWithRetry(prompt, isJson = false) {
-        // MANDATORY: Only use gemini-2.5-flash-preview-09-2025 in this environment.
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
         
         const payload = {
@@ -308,7 +365,8 @@
                         colors: { type: "ARRAY", items: { type: "OBJECT", properties: { name: { type: "STRING" }, hex: { type: "STRING" } } } },
                         refAnalysis: { type: "STRING" },
                         buildSteps: { type: "ARRAY", items: { type: "STRING" } }
-                    }
+                    },
+                    required: ["headingFont", "bodyFont", "colors", "refAnalysis", "buildSteps"]
                 }
             };
         }
@@ -336,7 +394,7 @@
         loader.style.display = 'flex';
         
         const brand = document.getElementById('brand_name').value || "Your Brand";
-        const prompt = `Generate a Shopify brand strategy brief for ${brand} in the ${document.getElementById('industry').value} industry. Style is ${document.getElementById('vibe').value}. Provide fonts, a 3-color palette, and 3 build steps.`;
+        const prompt = `Generate a Shopify brand strategy brief for ${brand} in the ${document.getElementById('industry').value} industry. Style is ${document.getElementById('vibe').value}. Target: ${document.getElementById('target_audience').value}. Provide fonts, a palette, and build steps.`;
 
         try {
             const res = await callGeminiWithRetry(prompt, true);
@@ -346,10 +404,10 @@
             document.getElementById('prop-font-head').innerText = data.headingFont;
             document.getElementById('prop-font-body').innerText = data.bodyFont + " System";
             document.getElementById('ref-analysis').innerText = data.refAnalysis;
-            document.getElementById('palette-list').innerHTML = data.colors.map(c => `
+            document.getElementById('palette-list').innerHTML = (data.colors || []).map(c => `
                 <div class="palette-item"><span class="color-dot" style="background:${c.hex}"></span><b>${c.name}</b> (${c.hex})</div>
             `).join('');
-            document.getElementById('build-plan').innerHTML = data.buildSteps.map(s => `<li>${s}</li>`).join('');
+            document.getElementById('build-plan').innerHTML = (data.buildSteps || []).map(s => `<li>${s}</li>`).join('');
 
             loader.style.display = 'none';
             document.getElementById('viewport').className = 'swipe-2';
@@ -357,10 +415,11 @@
             loader.style.display = 'none';
             showNotify("Using secure simulation mode (Local Engine).");
             // Local fallback logic
-            document.getElementById('prop-font-head').innerText = "Helvetica Bold";
-            document.getElementById('ref-analysis').innerText = "Market analysis based on local cached models.";
-            document.getElementById('palette-list').innerHTML = `<div class="palette-item"><span class="color-dot" style="background:#000"></span><b>Noir</b> (#000)</div>`;
-            document.getElementById('build-plan').innerHTML = "<li>Drafting layout grid</li><li>Optimizing mobile assets</li>";
+            document.getElementById('prop-brand').innerText = brand + " (Simulated Brief)";
+            document.getElementById('prop-font-head').innerText = "Inter Tight Bold";
+            document.getElementById('ref-analysis').innerText = "Market analysis based on industry defaults for " + document.getElementById('industry').value + ".";
+            document.getElementById('palette-list').innerHTML = `<div class="palette-item"><span class="color-dot" style="background:#000"></span><b>Noir</b> (#000000)</div><div class="palette-item"><span class="color-dot" style="background:#f2f2f7"></span><b>Mist</b> (#F2F2F7)</div>`;
+            document.getElementById('build-plan').innerHTML = "<li>Drafting layout grid</li><li>Optimizing mobile assets</li><li>Compiling Liquid templates</li>";
             setTimeout(() => { document.getElementById('viewport').className = 'swipe-2'; }, 1000);
         }
     }
@@ -388,13 +447,59 @@
         document.getElementById('step' + s).classList.add('active');
         document.getElementById('progress').style.width = (s/3)*100 + '%';
         document.getElementById('next-btn').innerText = (s === 3) ? "Generate Strategy" : "Continue";
+        document.getElementById('back-btn').innerText = (s === 1) ? "Exit" : "Back";
     }
 
     function showQuestionnaire() { document.getElementById('viewport').className = 'swipe-1'; }
 
+    // RESTORED IMPORT/EXPORT
+    function exportBrief() {
+        const formData = {
+            brand_name: document.getElementById('brand_name').value,
+            industry: document.getElementById('industry').value,
+            target_audience: document.getElementById('target_audience').value,
+            price_point: document.getElementById('price_point').value,
+            hook: document.getElementById('hook').value,
+            vibe: document.getElementById('vibe').value,
+            design_system: document.getElementById('design_system').value,
+            hero_product: document.getElementById('hero_product').value,
+            typo_vibe: document.getElementById('typo_vibe').value,
+            density: document.getElementById('density').value,
+            ref_sites: document.getElementById('ref_sites').value,
+            cta_text: document.getElementById('cta_text').value,
+            social_focus: document.getElementById('social_focus').value
+        };
+        const blob = new Blob([JSON.stringify(formData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `themegen-brief-${formData.brand_name || 'brand'}.json`;
+        a.click();
+    }
+
+    function handleImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                for (let key in data) {
+                    const el = document.getElementById(key);
+                    if (el) el.value = data[key];
+                }
+                showNotify("Brief uploaded successfully.");
+                showQuestionnaire();
+            } catch (err) {
+                showNotify("Error: Invalid JSON file.");
+            }
+        };
+        reader.readAsText(file);
+    }
+
     function startGeneration() {
         document.getElementById('viewport').className = 'swipe-3';
-        const logs = ["> Initializing Liquid Compiler...", "> Mapping Tailwind Tokens...", "> Generating layout/theme.liquid...", "> Building section: product-showcase.liquid...", "> Finalizing Assets..."];
+        const logs = ["> Initializing Liquid Compiler...", "> Mapping Tailwind Tokens...", "> Generating layout/theme.liquid...", "> Building section: product-showcase.liquid...", "> Compiling cart-drawer.liquid...", "> Optimizing Image Pipelines...", "> Finalizing Asset Packaging..."];
         let i = 0;
         const interval = setInterval(() => {
             if(i < logs.length) {
