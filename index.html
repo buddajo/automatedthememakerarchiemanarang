@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ThemeGen AI | Shopify Section Engine</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
             --bg: #ffffff;
@@ -195,7 +196,7 @@
                             </button>
                             <input type="file" id="brief_upload" style="display: none;" onchange="handleFileUpload(event)">
                             <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('brief_upload').click()">
-                                Upload Client Brief (COOPY)
+                                Upload Client Brief
                             </button>
                         </div>
                     </div>
@@ -205,7 +206,7 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                         <div>
                             <label>Brand Name</label>
-                            <input type="text" id="brand_name" placeholder="e.g. COOPY">
+                            <input type="text" id="brand_name" placeholder="Enter Brand Name">
                         </div>
                         <div>
                             <label>Industry</label>
@@ -213,6 +214,7 @@
                                 <option value="beauty">Beauty & Skincare</option>
                                 <option value="fashion">Fashion & Apparel</option>
                                 <option value="tech">Consumer Tech</option>
+                                <option value="home">Home & Living</option>
                             </select>
                         </div>
                     </div>
@@ -234,10 +236,10 @@
                     <span class="label">Step 2: Visuals</span>
                     <h2>Design & Vibe</h2>
                     <label>Visual Style Descriptor</label>
-                    <input type="text" id="vibe" placeholder="e.g. Minimalist luxury, K-Beauty Aesthetic">
+                    <input type="text" id="vibe" placeholder="e.g. Minimalist luxury, Editorial, etc.">
 
                     <label>Primary Hero Product</label>
-                    <input type="text" id="hero_product" placeholder="PDRN Serum">
+                    <input type="text" id="hero_product" placeholder="Enter Main Product Name">
 
                     <label>Typography Tone</label>
                     <select id="typo_vibe">
@@ -256,10 +258,10 @@
                     <span class="label">Step 3: Market Position</span>
                     <h2>Content & Context</h2>
                     <label>Reference Sites</label>
-                    <textarea id="ref_sites" rows="3" placeholder="https://glossier.com"></textarea>
+                    <textarea id="ref_sites" rows="3" placeholder="Enter competitor or inspiration URLs"></textarea>
 
                     <label>Core Marketing Hook</label>
-                    <input type="text" id="hook" placeholder="3% PDRN vs standard 0.5%">
+                    <input type="text" id="hook" placeholder="e.g. Unique value proposition">
 
                     <div class="nav-footer">
                         <button type="button" class="btn-back" onclick="moveStep(2)">Back</button>
@@ -280,7 +282,7 @@
                     <label>Identity Tokens</label>
                     <div style="padding: 15px; border: 1px solid var(--silver); border-radius: 12px; margin-bottom: 20px;">
                         <div id="prop-font-head" style="font-size: 1.4rem; font-weight: 700;">Loading...</div>
-                        <div id="prop-font-body" style="font-size: 0.85rem; color: var(--muted);">Sans-Serif Secondary</div>
+                        <div id="prop-font-body" style="font-size: 0.85rem; color: var(--muted);">Primary Design System</div>
                     </div>
                     <label>Brand Palette</label>
                     <div id="palette-list"></div>
@@ -317,7 +319,7 @@
 </div>
 
 <script>
-    const apiKey = "AIzaSyAP92p1h5awa9Y8EPpFctbzx4jP2qXluqM"; // API Key required for real generation
+    const apiKey = "AIzaSyAP92p1h5awa9Y8EPpFctbzx4jP2qXluqM"; 
 
     function showLoader(title, desc) {
         const l = document.getElementById('loader');
@@ -369,24 +371,64 @@
         return result.candidates?.[0]?.content?.parts?.[0]?.text;
     }
 
+    /**
+     * Fixed PDF Generation: Creates a generic placeholder document
+     */
     function handleDownloadSample() {
-        const text = "COOPY Brand Identity Document...";
-        const blob = new Blob([text], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'COOPY_Brief_Brief.pdf';
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(22);
+        doc.text("Shopify Brand Brief Template", 20, 20);
+        
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(100);
+        doc.text("Generated by ThemeGen AI Onboarding Engine", 20, 28);
+        
+        doc.setDrawColor(200);
+        doc.line(20, 35, 190, 35);
+        
+        doc.setFontSize(14);
+        doc.setTextColor(0);
+        doc.setFont("helvetica", "bold");
+        doc.text("1. Brand Foundation", 20, 45);
+        
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        doc.text("Brand Name: [Enter Brand Name]", 25, 55);
+        doc.text("Industry: [Enter Industry]", 25, 62);
+        doc.text("Main Objective: [Enter Goal]", 25, 69);
+        
+        doc.setFont("helvetica", "bold");
+        doc.text("2. Design & Visuals", 20, 85);
+        doc.setFont("helvetica", "normal");
+        doc.text("Style Descriptor: [Enter Aesthetic Vibe]", 25, 95);
+        doc.text("Hero Product: [Enter Main SKU]", 25, 102);
+        doc.text("Reference Aesthetic: [Enter Competitive Links]", 25, 109);
+        
+        doc.setFont("helvetica", "bold");
+        doc.text("3. Marketing Context", 20, 125);
+        doc.setFont("helvetica", "normal");
+        doc.text("Core Hook: [Enter Value Proposition]", 25, 135);
+        
+        doc.setFontSize(9);
+        doc.setTextColor(150);
+        doc.text("This brief is ready for ingestion by the ThemeGen Liquid Compiler.", 20, 280);
+
+        doc.save('Brand_Brief_Template.pdf');
     }
 
     function handleFileUpload(e) {
-        showLoader("Parsing Brief...", "Reading Jotform submission for COOPY...");
+        showLoader("Parsing Brief...", "Analyzing submission details...");
         setTimeout(() => {
-            document.getElementById('brand_name').value = "COOPY";
+            document.getElementById('brand_name').value = "Placeholder Brand";
             document.getElementById('industry').value = "beauty";
-            document.getElementById('vibe').value = "High-end K-Beauty / Rejuran Inspiration";
-            document.getElementById('hero_product').value = "PDRN Serum (3% Concentration)";
-            document.getElementById('hook').value = "Visible skin transformation (PDRN 3% Formula)";
-            document.getElementById('ref_sites').value = "https://rejuran.com\nhttps://melaxin.com";
+            document.getElementById('vibe').value = "Minimalist luxury aesthetic";
+            document.getElementById('hero_product').value = "Premium Skincare Serum";
+            document.getElementById('hook').value = "Advanced clinical results at home";
+            document.getElementById('ref_sites').value = "https://example.com";
             hideLoader();
             moveStep(2);
         }, 1500);
@@ -395,8 +437,8 @@
     async function triggerProposal() {
         showLoader("AI Strategist thinking...", "Crafting your brand identity tokens...");
         
-        const brand = document.getElementById('brand_name').value;
-        const prompt = `Create a Shopify theme strategy for ${brand}. Vibe: ${document.getElementById('vibe').value}. Industry: Beauty. Refs: ${document.getElementById('ref_sites').value}`;
+        const brand = document.getElementById('brand_name').value || "Your Brand";
+        const prompt = `Create a Shopify theme strategy for ${brand}. Vibe: ${document.getElementById('vibe').value}. Industry: ${document.getElementById('industry').value}. Refs: ${document.getElementById('ref_sites').value}`;
 
         try {
             const res = await callGemini(prompt, true);
@@ -414,7 +456,7 @@
             document.getElementById('viewport').className = 'swipe-2';
         } catch (err) {
             const errBox = document.getElementById('error-display');
-            errBox.innerText = `Error: ${err.message}. (Did you add the API Key?)`;
+            errBox.innerText = `Error: ${err.message}.`;
             errBox.style.display = 'block';
         }
     }
@@ -433,7 +475,7 @@
             "> Initializing Liquid Compiler...",
             "> Fetching Splide.js for Product Carousels...",
             "> Generating layout/theme.liquid...",
-            "> Building section: pdrn-comparison-table.liquid...",
+            "> Building section: product-feature-showcase.liquid...",
             "> Injecting Tailwind configuration...",
             "> Finalizing Zip Packaging..."
         ];
