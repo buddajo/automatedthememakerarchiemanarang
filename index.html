@@ -62,11 +62,13 @@
             cursor: pointer;
             transition: 0.3s all ease;
             border: none;
+            text-align: center;
         }
 
         .btn-black { background: var(--black); color: #fff; }
         .btn-black:hover { transform: scale(1.03); background: #333; }
         .btn-outline { background: transparent; border: 1px solid var(--silver); color: var(--text); }
+        .btn-sm { padding: 10px 20px; font-size: 0.85rem; }
 
         /* LANDING PAGE SECTIONS */
         .landing-wrapper { overflow-y: auto; height: 100vh; }
@@ -133,6 +135,15 @@
         }
         .progress-fill { height: 100%; background: var(--black); width: 33%; transition: width 0.4s ease; }
 
+        /* UPLOAD AREA */
+        .upload-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--silver);
+        }
+
         /* PROPOSAL & GENERATION VIEW STYLES */
         .proposal-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; margin-top: 30px; }
         .color-dot { width: 30px; height: 30px; border-radius: 50%; display: inline-block; margin-right: 10px; border: 1px solid #ddd; }
@@ -191,6 +202,20 @@
                 <div class="step active" id="step1">
                     <span class="label">Step 1 of 3</span>
                     <h2>Identity & Focus</h2>
+                    
+                    <!-- NEW UPLOAD/DOWNLOAD BUTTONS -->
+                    <div class="upload-options">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="handleDownloadSample()">
+                            Download Sample Brief
+                        </button>
+                        <div style="position: relative;">
+                            <input type="file" id="brief_upload" style="display: none;" onchange="handleFileUpload(event)">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('brief_upload').click()">
+                                Upload Filled Brief
+                            </button>
+                        </div>
+                    </div>
+
                     <label>Brand Name</label>
                     <input type="text" id="brand_name" placeholder="e.g. Acme Co.">
                     <label>Primary Business Objective</label>
@@ -307,9 +332,38 @@
         document.getElementById('progress').style.width = (stepNum / 3) * 100 + '%';
     }
 
+    // New Handlers for Brief Assets
+    function handleDownloadSample() {
+        // In a real app, this would be a link to a PDF or CSV template
+        alert("Downloading 'ThemeGen_Brand_Brief_Template.pdf'...");
+    }
+
+    function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+            document.getElementById('loader').style.display = 'flex';
+            document.getElementById('loader').querySelector('div').innerText = "Processing Document...";
+            document.getElementById('loader').querySelector('p').innerText = "Extracting brand identity and objectives...";
+            
+            // Simulate AI parsing the uploaded PDF
+            setTimeout(() => {
+                document.getElementById('brand_name').value = "COOPY";
+                document.getElementById('site_goal').value = "direct_sales";
+                document.getElementById('vibe').value = "Premium, High-Conversion TikTok Shop Identity";
+                document.getElementById('hero_product').value = "Best-selling Skin Care Bundle";
+                document.getElementById('avatar').value = "Direct-to-consumer shoppers looking for premium aesthetics on social platforms.";
+                document.getElementById('hook').value = "Premium quality accessible via TikTok Shop integration.";
+                
+                document.getElementById('loader').style.display = 'none';
+                moveStep(2); // Auto-advance to review the parsed data
+            }, 2000);
+        }
+    }
+
     function triggerProposal() {
         const brand = document.getElementById('brand_name').value || "Your Brand";
         document.getElementById('loader').style.display = 'flex';
+        document.getElementById('loader').querySelector('div').innerText = "Creative Director is thinking...";
         
         setTimeout(() => {
             document.getElementById('loader').style.display = 'none';
