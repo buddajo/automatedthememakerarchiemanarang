@@ -242,16 +242,17 @@
                 <div class="step active" id="step1">
                     <span class="label">Step 1 of 3</span>
                     <h2>Identity & Focus</h2>
-                    <p>Let's define the foundation of the COOPY theme.</p>
+                    <p>Let's define the foundation of your new Shopify theme.</p>
                     
                     <label>Brand Name</label>
-                    <input type="text" id="brand_name" value="COOPY" placeholder="e.g. COOPY">
+                    <input type="text" id="brand_name" value="" placeholder="e.g. Acme Co.">
                     
                     <label>Main Goal for Website</label>
                     <select id="site_goal">
+                        <option value="" disabled selected>Select your primary objective</option>
                         <option value="direct_sales">Increase total GMV and order volume</option>
                         <option value="brand_trust">Build brand credibility and trust</option>
-                        <option value="conversion">Optimise conversion rate on TikTok Shop</option>
+                        <option value="conversion">Optimise conversion rate on Social Commerce</option>
                     </select>
 
                     <div class="nav-footer">
@@ -267,10 +268,10 @@
                     <p>Define the visual language of the sections.</p>
                     
                     <label>Visual Vibe</label>
-                    <input type="text" id="vibe" placeholder="e.g. Creative Freedom, Minimalist, High-end">
+                    <input type="text" id="vibe" placeholder="e.g. Modern, Minimalist, High-end, Bold">
                     
                     <label>Hero Product Focus</label>
-                    <input type="text" id="hero_product" value="COOPY PDRN Serum" placeholder="Primary product to highlight">
+                    <input type="text" id="hero_product" value="" placeholder="Primary product or collection to highlight">
 
                     <div class="nav-footer">
                         <button type="button" class="btn-back" onclick="moveStep(1)">Back</button>
@@ -285,10 +286,10 @@
                     <p>Who are we building for?</p>
                     
                     <label>Target Customer Avatar</label>
-                    <textarea id="avatar" rows="3">Women aged 26-46 who have good skin or visible transformation with the product.</textarea>
+                    <textarea id="avatar" rows="3" placeholder="Describe your ideal customer (age, interests, pain points)..."></textarea>
                     
                     <label>Core Marketing Hook</label>
-                    <input type="text" id="hook" value="3% PDRN - Not just 0.5-1%">
+                    <input type="text" id="hook" value="" placeholder="What makes your product unique?">
 
                     <div class="nav-footer">
                         <button type="button" class="btn-back" onclick="moveStep(2)">Back</button>
@@ -328,8 +329,13 @@
             hook: document.getElementById('hook').value
         };
 
+        if(!data.brand) {
+            alert("Please provide a brand name to continue.");
+            return;
+        }
+
         console.log("SENDING DATA TO AI:", data);
-        alert(`Initializing Gemini Build for ${data.brand}...\n\nIn the next phase, we will trigger the AI to generate the Liquid sections for the ${data.product}.`);
+        alert(`Initializing Gemini Build for ${data.brand}...\n\nIn the next phase, we will trigger the AI to generate the Liquid sections for your brand.`);
     }
 </script>
 
