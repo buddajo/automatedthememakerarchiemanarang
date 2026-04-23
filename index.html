@@ -30,9 +30,9 @@
             scroll-behavior: smooth;
         }
 
-        /* 2-Page Horizontal Slider */
+        /* 3-Page Horizontal Slider */
         #viewport {
-            width: 200vw;
+            width: 300vw;
             display: flex;
             transition: transform var(--transition-speed) var(--ease);
             will-change: transform;
@@ -88,7 +88,7 @@
         .feature-card { padding: 40px; background: var(--accent); border-radius: 24px; }
         .feature-card h3 { margin-top: 0; font-size: 1.5rem; }
 
-        /* QUESTIONNAIRE PAGE */
+        /* APP PAGES */
         .app-page {
             background-color: #f2f2f7;
             display: flex;
@@ -100,12 +100,12 @@
         .form-container {
             background: #fff;
             width: 100%;
-            max-width: 700px;
+            max-width: 800px;
             border-radius: 32px;
             padding: 60px;
             box-shadow: 0 30px 60px rgba(0,0,0,0.05);
             position: relative;
-            min-height: 500px;
+            min-height: 600px;
         }
 
         .step { display: none; }
@@ -115,9 +115,6 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .form-container h2 { font-size: 2rem; margin-bottom: 10px; letter-spacing: -1px; }
-        .form-container p { color: var(--muted); margin-bottom: 40px; line-height: 1.6; }
 
         label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 10px; color: #333; }
         input, select, textarea {
@@ -135,22 +132,22 @@
         .btn-back { background: none; border: 1px solid var(--silver); padding: 15px 30px; border-radius: 100px; cursor: pointer; }
 
         .progress-bar {
-            height: 4px;
-            background: var(--silver);
-            width: 100%;
-            position: absolute;
-            top: 0; left: 0;
-            border-radius: 32px 32px 0 0;
-            overflow: hidden;
+            height: 4px; background: var(--silver); width: 100%; position: absolute; top: 0; left: 0; border-radius: 32px 32px 0 0; overflow: hidden;
         }
-        .progress-fill {
-            height: 100%;
-            background: var(--black);
-            width: 33%;
-            transition: width 0.4s ease;
+        .progress-fill { height: 100%; background: var(--black); width: 33%; transition: width 0.4s ease; }
+
+        /* PROPOSAL VIEW STYLES */
+        .proposal-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; margin-top: 30px; }
+        .color-dot { width: 30px; height: 30px; border-radius: 50%; display: inline-block; margin-right: 10px; border: 1px solid #ddd; }
+        .palette-item { display: flex; align-items: center; margin-bottom: 15px; font-size: 0.9rem; }
+        .loading-overlay { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(255,255,255,0.9); z-index: 10; display: none;
+            flex-direction: column; justify-content: center; align-items: center; border-radius: 32px;
         }
 
-        .swiped { transform: translateX(-100vw); }
+        .swipe-1 { transform: translateX(-100vw); }
+        .swipe-2 { transform: translateX(-200vw); }
 
     </style>
 </head>
@@ -164,19 +161,7 @@
             <span class="label">Next-Gen Shopify Tool</span>
             <h1>ThemeGen AI</h1>
             <p>Convert brand briefs into high-conversion, premium Shopify sections instantly.</p>
-            <button class="btn btn-black" onclick="toggleView()">Start Creating Themes</button>
-        </section>
-
-        <section class="section-padding">
-            <div class="container grid">
-                <div>
-                    <span class="label">The Problem</span>
-                    <h2>Stop Rewriting <br>Boilerplate Code.</h2>
-                </div>
-                <div>
-                    <p style="font-size: 1.2rem; line-height: 1.7;">Manual Shopify development is slow. We've automated the architecture so you can focus on high-end UI/UX delivery.</p>
-                </div>
-            </div>
+            <button class="btn btn-black" onclick="showQuestionnaire()">Start Creating Themes</button>
         </section>
     </div>
 
@@ -184,17 +169,17 @@
     <div class="full-page app-page">
         <div class="form-container">
             <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+            <div class="loading-overlay" id="loader">
+                <div style="font-size: 1.5rem; font-weight: 600;">Creative Director is thinking...</div>
+                <p>Analyzing industry and choosing design system.</p>
+            </div>
             
             <form id="ai-generator-form">
-                <!-- Step 1 -->
                 <div class="step active" id="step1">
                     <span class="label">Step 1 of 3</span>
                     <h2>Identity & Focus</h2>
-                    <p>Let's define the foundation of your custom theme build.</p>
-                    
                     <label>Brand Name</label>
                     <input type="text" id="brand_name" placeholder="e.g. Acme Co.">
-                    
                     <label>Primary Business Objective</label>
                     <select id="site_goal">
                         <option value="" disabled selected>Select objective</option>
@@ -202,107 +187,139 @@
                         <option value="brand_trust">Premium Identity & Credibility</option>
                         <option value="social_commerce">TikTok/Meta Ad Conversion</option>
                     </select>
-
                     <div class="nav-footer">
-                        <button type="button" class="btn-back" onclick="toggleView()">Exit</button>
+                        <button type="button" class="btn-back" onclick="exitToLanding()">Exit</button>
                         <button type="button" class="btn btn-black" onclick="moveStep(2)">Continue</button>
                     </div>
                 </div>
 
-                <!-- Step 2 -->
                 <div class="step" id="step2">
                     <span class="label">Step 2 of 3</span>
                     <h2>Design Aesthetics</h2>
-                    <p>Define the creative direction for the AI Creative Director.</p>
-                    
                     <label>Industry & Visual Vibe</label>
                     <input type="text" id="vibe" placeholder="e.g. Luxury Skincare, Minimalist, Bold Typography">
-                    
                     <label>Key Hero Product / Collection</label>
                     <input type="text" id="hero_product" placeholder="What are we featuring first?">
-
                     <div class="nav-footer">
                         <button type="button" class="btn-back" onclick="moveStep(1)">Back</button>
                         <button type="button" class="btn btn-black" onclick="moveStep(3)">Continue</button>
                     </div>
                 </div>
 
-                <!-- Step 3 -->
                 <div class="step" id="step3">
                     <span class="label">Step 3 of 3</span>
                     <h2>Marketing Context</h2>
-                    <p>Finalizing the architectural brief.</p>
-                    
                     <label>Target Audience Description</label>
                     <textarea id="avatar" rows="3" placeholder="Who is the ideal customer?"></textarea>
-                    
                     <label>The Core Marketing "Hook"</label>
                     <input type="text" id="hook" placeholder="What is the unique selling point?">
-
                     <div class="nav-footer">
                         <button type="button" class="btn-back" onclick="moveStep(2)">Back</button>
-                        <button type="button" class="btn btn-black" onclick="finishBuild()">Build Theme Engine</button>
+                        <button type="button" class="btn btn-black" onclick="triggerProposal()">Generate Strategy</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- PAGE 3: THE AI PROPOSAL -->
+    <div class="full-page app-page">
+        <div class="form-container">
+            <span class="label">AI Proposal & Strategy</span>
+            <h2 id="prop-brand">Project Brief Acknowledged.</h2>
+            <p>Based on your directives, here is the proposed design system and build plan.</p>
+
+            <div class="proposal-grid">
+                <div>
+                    <label>Typography Pairing</label>
+                    <div style="padding: 15px; border: 1px solid var(--silver); border-radius: 12px; margin-bottom: 20px;">
+                        <div id="prop-font-head" style="font-size: 1.5rem; font-weight: 700;">Heading Font</div>
+                        <div id="prop-font-body" style="font-size: 0.9rem; color: var(--muted);">Body Font</div>
+                    </div>
+
+                    <label>Color Palette</label>
+                    <div id="palette-list">
+                        <!-- Colors will be injected here -->
+                    </div>
+                </div>
+                <div>
+                    <label>Plan of Attack</label>
+                    <ul id="build-plan" style="line-height: 1.8; font-size: 0.95rem;">
+                        <!-- List will be injected here -->
+                    </ul>
+                </div>
+            </div>
+
+            <div class="nav-footer" style="margin-top: 40px; border-top: 1px solid var(--silver); padding-top: 20px;">
+                <button type="button" class="btn-back" onclick="moveStep(3); document.getElementById('viewport').className='swipe-1'">Edit Brief</button>
+                <button type="button" class="btn btn-black" onclick="startGeneration()">Approve & Write First Section</button>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
-    function toggleView() {
-        const vp = document.getElementById('viewport');
-        vp.classList.toggle('swiped');
+    function showQuestionnaire() {
+        document.getElementById('viewport').className = 'swipe-1';
         window.scrollTo(0,0);
+    }
+
+    function exitToLanding() {
+        document.getElementById('viewport').className = '';
     }
 
     function moveStep(stepNum) {
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
         document.getElementById('step' + stepNum).classList.add('active');
-        const progress = (stepNum / 3) * 100;
-        document.getElementById('progress').style.width = progress + '%';
+        document.getElementById('progress').style.width = (stepNum / 3) * 100 + '%';
     }
 
-    /**
-     * FINAL BUILD ENGINE
-     * This prepares the specialized prompt for the AI transition
-     */
-    function finishBuild() {
-        const userInput = {
-            brandName: document.getElementById('brand_name').value,
-            goal: document.getElementById('site_goal').value,
-            vibe: document.getElementById('vibe').value,
-            product: document.getElementById('hero_product').value,
-            audience: document.getElementById('avatar').value,
-            hook: document.getElementById('hook').value
-        };
+    function triggerProposal() {
+        const brand = document.getElementById('brand_name').value || "Your Brand";
+        document.getElementById('loader').style.display = 'flex';
+        
+        // Simulate AI Thinking
+        setTimeout(() => {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('viewport').className = 'swipe-2';
+            
+            // Populate Proposal Data
+            document.getElementById('prop-brand').innerText = brand + " Build Plan";
+            
+            // Mock AI Response Logic
+            document.getElementById('prop-font-head').innerText = "Cormorant Garamond";
+            document.getElementById('prop-font-body').innerText = "Inter (62.5% Scaling)";
+            
+            const colors = [
+                { name: "Background", hex: "#FFFFFF" },
+                { name: "Text", hex: "#1A1A1A" },
+                { name: "Accent", hex: "#D4AF37" },
+                { name: "Muted", hex: "#F5F5F7" }
+            ];
+            
+            const paletteHtml = colors.map(c => `
+                <div class="palette-item">
+                    <span class="color-dot" style="background:${c.hex}"></span>
+                    <b>${c.name}:</b> ${c.hex}
+                </div>
+            `).join('');
+            document.getElementById('palette-list').innerHTML = paletteHtml;
 
-        if(!userInput.brandName) { alert("Brand Name is required."); return; }
+            const plan = [
+                "Initialize layout/theme.liquid with Lucide & Splide CDNs",
+                "Generate Premium Hero Section with massive typography",
+                "Build AJAX-powered Feature Collection grid",
+                "Design interactive Marquee / Hook section",
+                "Compile into downloadable .zip package"
+            ];
+            document.getElementById('build-plan').innerHTML = plan.map(item => `<li>${item}</li>`).join('');
 
-        // Preparing the "System Context" based on your Senior Dev Prompt
-        const systemDirectives = `
-            ROLE: Senior Full-Stack Shopify Developer & Creative Director.
-            TECH STACK: Splide.js (CDN), Lucide Icons (CDN).
-            RULES: No Dawn theme dependencies. Self-contained .liquid sections. 
-            DESIGN: Premium, 62.5% font scaling (1rem = 10px). Max-width 1920px.
-            ANIMATION: Smooth 0.3s ease transitions, 2rem+ rounded corners.
-        `;
+        }, 1500);
+    }
 
-        const finalBrief = `
-            PROJECT BRIEF:
-            Brand: ${userInput.brandName}
-            Objective: ${userInput.goal}
-            Vibe: ${userInput.vibe}
-            Focus: ${userInput.product}
-            Target Audience: ${userInput.audience}
-            Unique Hook: ${userInput.hook}
-        `;
-
-        console.log("SYSTEM DIRECTIVES:", systemDirectives);
-        console.log("FINAL BRIEF:", finalBrief);
-
-        alert(`Brief Finalized for ${userInput.brandName}!\n\nAI is now standing by to propose Typography and Color Palette based on your directives.\n\nCheck Console (F12) for the full payload.`);
+    function startGeneration() {
+        alert("APPROVAL RECEIVED. Starting Section 1 (Hero Slider) generation with Splide.js and Lucide Icons.");
     }
 </script>
 
