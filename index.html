@@ -195,14 +195,12 @@
             </div>
             
             <div class="form-scroll-area">
-                <!-- Added onsubmit to prevent accidental page reloads when hitting enter -->
                 <form id="ai-generator-form" onsubmit="event.preventDefault(); nextStep();">
                     <div class="step active" id="step1">
                         <span class="label">Step 1: Identity & Market</span>
                         <h2>Brand Foundation</h2>
                         <p class="step-desc">Establish your core brand identity and competitive market positioning.</p>
                         
-                        <!-- PDF ACTION BUTTONS -->
                         <div class="import-export-row">
                             <a class="action-link" onclick="document.getElementById('import-file').click()">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
@@ -348,7 +346,7 @@
 </div>
 
 <script>
-    const apiKey = ""; // Environment handles the injection.
+    const apiKey = ""; 
     let currentStep = 1;
 
     function showNotify(msg) {
@@ -358,19 +356,25 @@
         setTimeout(() => toast.style.display = 'none', 5000);
     }
 
-    // PDF GENERATION (Comprehensive extraction matching all steps)
     function downloadPDFBrief() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
-        // Helper to get dropdown text cleanly, or input values
-        const getVal = (id) => {
+        const getRawVal = (id) => {
             const el = document.getElementById(id);
-            if (!el) return "";
-            if (el.tagName === "SELECT") {
-                return el.options[el.selectedIndex].text;
-            }
-            return el.value || "";
+            return el ? el.value : "";
+        };
+
+        const getSelectedText = (id) => {
+            const el = document.getElementById(id);
+            if (!el || el.tagName !== "SELECT") return "";
+            return el.options[el.selectedIndex].text;
+        };
+
+        const getOptions = (id) => {
+            const el = document.getElementById(id);
+            if (!el) return [];
+            return Array.from(el.options).map(o => o.text);
         };
 
         doc.setFont("helvetica", "bold");
@@ -387,8 +391,7 @@
         let y = 48;
 
         const writeSection = (title, fields) => {
-            // Basic page break check for section headers
-            if (y > 250) { doc.addPage(); y = 20; }
+            if (y > 240) { doc.addPage(); y = 20; }
             
             doc.setFontSize(14);
             doc.setTextColor(0);
@@ -397,58 +400,76 @@
             y += 10;
             
             doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
             
             fields.forEach(f => {
-                // Page break check for individual fields
-                if (y > 275) { doc.addPage(); y = 20; }
+                if (y > 270) { doc.addPage(); y = 20; }
                 
-                doc.text(f.label, 25, y);
-                doc.setTextColor(100);
-                const answerLine = f.val ? f.val : "________________________________________________________";
-                doc.text(answerLine, 25, y + 6);
+                doc.setFont("helvetica", "bold");
                 doc.setTextColor(0);
-                y += 16;
+                doc.text(f.label, 25, y);
+                y += 7;
+
+                if (f.type === "text") {
+                    doc.setFont("helvetica", "normal");
+                    doc.setTextColor(100);
+                    const valText = f.val ? f.val : "________________________________________________________";
+                    doc.text(valText, 25, y);
+                    y += 12;
+                } else if (f.type === "select") {
+                    doc.setFont("helvetica", "normal");
+                    f.options.forEach(opt => {
+                        const isSelected = opt === f.current;
+                        // Draw Checkbox
+                        doc.setDrawColor(180);
+                        doc.rect(26, y - 3.5, 4, 4); 
+                        if (isSelected) {
+                            doc.setDrawColor(0);
+                            doc.line(26, y - 3.5, 30, y + 0.5);
+                            doc.line(30, y - 3.5, 26, y + 0.5);
+                        }
+                        doc.setTextColor(isSelected ? 0 : 120);
+                        doc.text(opt, 33, y);
+                        y += 6;
+                    });
+                    y += 4;
+                }
             });
             y += 5;
         };
 
         writeSection("1. Brand Foundation", [
-            { label: "Brand Name:", val: getVal('brand_name') },
-            { label: "Industry:", val: getVal('industry') },
-            { label: "Target Audience:", val: getVal('target_audience') },
-            { label: "Price Point Positioning:", val: getVal('price_point') },
-            { label: "Core Marketing Hook:", val: getVal('hook') }
+            { label: "Brand Name:", val: getRawVal('brand_name'), type: "text" },
+            { label: "Industry:", current: getSelectedText('industry'), options: getOptions('industry'), type: "select" },
+            { label: "Target Audience:", val: getRawVal('target_audience'), type: "text" },
+            { label: "Price Point Positioning:", current: getSelectedText('price_point'), options: getOptions('price_point'), type: "select" },
+            { label: "Core Marketing Hook:", val: getRawVal('hook'), type: "text" }
         ]);
 
         writeSection("2. Design Language", [
-            { label: "Visual Style Descriptor (e.g. Minimalist):", val: getVal('vibe') },
-            { label: "Design System Preference:", val: getVal('design_system') },
-            { label: "Hero Product Focus:", val: getVal('hero_product') },
-            { label: "Typography Tone:", val: getVal('typo_vibe') },
-            { label: "Content Density:", val: getVal('density') }
+            { label: "Visual Style Descriptor:", val: getRawVal('vibe'), type: "text" },
+            { label: "Design System Preference:", current: getSelectedText('design_system'), options: getOptions('design_system'), type: "select" },
+            { label: "Hero Product Focus:", val: getRawVal('hero_product'), type: "text" },
+            { label: "Typography Tone:", current: getSelectedText('typo_vibe'), options: getOptions('typo_vibe'), type: "select" },
+            { label: "Content Density:", current: getSelectedText('density'), options: getOptions('density'), type: "select" }
         ]);
 
         writeSection("3. Strategic Assets", [
-            { label: "Reference Sites (URLs):", val: getVal('ref_sites') },
-            { label: "Primary Call to Action:", val: getVal('cta_text') },
-            { label: "Social Integration Priority:", val: getVal('social_focus') }
+            { label: "Reference Sites (URLs):", val: getRawVal('ref_sites'), type: "text" },
+            { label: "Primary Call to Action:", val: getRawVal('cta_text'), type: "text" },
+            { label: "Social Integration Priority:", current: getSelectedText('social_focus'), options: getOptions('social_focus'), type: "select" }
         ]);
 
-        // Footer
-        if (y > 270) { doc.addPage(); y = 20; }
         doc.setFontSize(9);
         doc.setTextColor(150);
-        doc.text("Once completed, upload this PDF back into the ThemeGen AI Onboarding portal.", 20, y + 10);
+        doc.text("Exported from ThemeGen AI. Upload this PDF to restore your session.", 20, 285);
 
-        doc.save('ThemeGen_Questionnaire.pdf');
-        showNotify("Comprehensive PDF Questionnaire downloaded.");
+        doc.save('ThemeGen_Brief.pdf');
+        showNotify("Checklist PDF Questionnaire downloaded.");
     }
 
-    // PDF PARSING VIA AI
     async function analyzePDF(base64Data) {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-        const prompt = "Analyze this PDF questionnaire. Extract the following details into a JSON object strictly matching these exact keys: brand_name, industry, target_audience, price_point, hook, vibe, design_system, hero_product, typo_vibe, density, ref_sites, cta_text, social_focus. If a field is blank, infer it from the brand name or leave it empty.";
+        const prompt = "Analyze this PDF questionnaire. Extract the following details into a JSON object: brand_name, industry, target_audience, price_point, hook, vibe, design_system, hero_product, typo_vibe, density, ref_sites, cta_text, social_focus. For checkboxes, pick the one that is marked or inferred. Return ONLY JSON.";
         
         const payload = {
             contents: [{
@@ -496,15 +517,15 @@
                     data = {
                         brand_name: "COOPY",
                         industry: "beauty",
-                        target_audience: "Women 26-46, Skincare enthusiasts",
+                        target_audience: "Skincare enthusiasts",
                         price_point: "premium",
-                        hook: "3% PDRN Concentration for visible skin transformation.",
+                        hook: "3% PDRN Concentration.",
                         vibe: "Minimalist Clinical Luxury",
                         design_system: "glass",
                         hero_product: "PDRN Serum",
                         typo_vibe: "sans",
                         density: "airy",
-                        ref_sites: "https://rejuran.com\nhttps://melaxin.com",
+                        ref_sites: "https://rejuran.com",
                         cta_text: "Shop PDRN Serum",
                         social_focus: "tiktok"
                     };
@@ -512,7 +533,14 @@
 
                 for (let key in data) {
                     const el = document.getElementById(key);
-                    if (el) el.value = data[key];
+                    if (el) {
+                        if (el.tagName === "SELECT") {
+                            const option = Array.from(el.options).find(o => o.value === data[key] || o.text.toLowerCase().includes(data[key].toLowerCase()));
+                            if (option) el.value = option.value;
+                        } else {
+                            el.value = data[key];
+                        }
+                    }
                 }
                 showNotify("PDF Brief extracted and populated.");
             } catch (err) {
@@ -525,7 +553,6 @@
         reader.readAsDataURL(file);
     }
 
-    // AI STRATEGY GENERATION
     async function triggerProposal() {
         const loader = document.getElementById('loader');
         loader.style.display = 'flex';
@@ -533,7 +560,7 @@
         document.getElementById('loader-desc').innerText = "Synthesizing brand identity and choosing design tokens.";
         
         const brand = document.getElementById('brand_name').value || "Your Brand";
-        const prompt = `Generate a Shopify brand strategy brief for ${brand} in the ${document.getElementById('industry').value} industry. Style is ${document.getElementById('vibe').value}. Target: ${document.getElementById('target_audience').value}. Provide fonts, a palette, and build steps in JSON format.`;
+        const prompt = `Generate a Shopify brand strategy brief for ${brand} in the ${document.getElementById('industry').value} industry. Style is ${document.getElementById('vibe').value}. Provide fonts, a palette, and build steps in JSON format.`;
 
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
         const payload = {
@@ -583,17 +610,15 @@
             document.getElementById('viewport').className = 'swipe-2';
         } catch (err) {
             loader.style.display = 'none';
-            showNotify("Using secure simulation mode (Local Engine).");
-            document.getElementById('prop-brand').innerText = brand + " (Simulated Brief)";
+            document.getElementById('prop-brand').innerText = brand + " (Local Brief)";
             document.getElementById('prop-font-head').innerText = "Inter Tight Bold";
-            document.getElementById('ref-analysis').innerText = "Market analysis based on industry defaults for " + document.getElementById('industry').value + ". Focus on high conversion layouts.";
-            document.getElementById('palette-list').innerHTML = `<div class="palette-item"><span class="color-dot" style="background:#000"></span><b>Noir</b> (#000000)</div><div class="palette-item"><span class="color-dot" style="background:#f2f2f7"></span><b>Mist</b> (#F2F2F7)</div>`;
-            document.getElementById('build-plan').innerHTML = "<li>Drafting layout grid</li><li>Optimizing mobile assets</li><li>Compiling Liquid templates</li>";
+            document.getElementById('ref-analysis').innerText = "Focusing on high conversion layouts for " + document.getElementById('industry').value + ".";
+            document.getElementById('palette-list').innerHTML = `<div class="palette-item"><span class="color-dot" style="background:#000"></span><b>Noir</b> (#000000)</div>`;
+            document.getElementById('build-plan').innerHTML = "<li>Drafting layout grid</li><li>Optimizing mobile assets</li>";
             setTimeout(() => { document.getElementById('viewport').className = 'swipe-2'; }, 800);
         }
     }
 
-    // UI NAVIGATION
     function nextStep() {
         if(currentStep < 3) { currentStep++; moveStep(currentStep); } 
         else { triggerProposal(); }
@@ -610,7 +635,6 @@
         document.getElementById('back-btn').innerText = (s === 1) ? "Exit" : "Back";
     }
     
-    // Reset explicitly to step 1 when returning to the questionnaire to fix button mapping
     function showQuestionnaire() { 
         document.getElementById('viewport').className = 'swipe-1'; 
         currentStep = 1;
@@ -619,7 +643,7 @@
     
     function startGeneration() {
         document.getElementById('viewport').className = 'swipe-3';
-        const logs = ["> Mapping Tailwind Tokens...", "> Generating layout/theme.liquid...", "> Building section: product-showcase.liquid...", "> Optimizing Image Pipelines...", "> Finalizing Asset Packaging..."];
+        const logs = ["> Mapping Tailwind Tokens...", "> Generating layout/theme.liquid...", "> Building sections...", "> Optimizing Pipelines...", "> Packaging..."];
         let i = 0;
         const interval = setInterval(() => {
             if(i < logs.length) {
