@@ -15,6 +15,8 @@
             --black: #000000;
             --muted: #6e6e73;
             --primary: #007aff;
+            --error-bg: #fff1f0;
+            --error-text: #ff4d4f;
             --transition-speed: 0.8s;
             --ease: cubic-bezier(0.85, 0, 0.15, 1);
         }
@@ -56,7 +58,7 @@
         }
 
         .btn-black { background: var(--black); color: #fff; }
-        .btn-black:hover { transform: scale(1.03); background: #333; }
+        .btn-black:hover { transform: scale(1.02); background: #333; }
         .btn-outline { background: transparent; border: 1px solid var(--silver); color: var(--text); }
         .btn-sm { padding: 12px 24px; font-size: 0.85rem; border-radius: 12px; }
 
@@ -97,9 +99,7 @@
             margin-top: 20px;
         }
 
-        /* Custom Scrollbar */
         .form-scroll-area::-webkit-scrollbar { width: 6px; }
-        .form-scroll-area::-webkit-scrollbar-track { background: transparent; }
         .form-scroll-area::-webkit-scrollbar-thumb { background: var(--silver); border-radius: 10px; }
 
         .step { display: none; }
@@ -120,21 +120,13 @@
             font-size: 0.95rem;
             margin-bottom: 20px;
             font-family: inherit;
-            transition: border-color 0.3s;
         }
-        input:focus, select:focus, textarea:focus { border-color: var(--black); }
 
         .nav-footer { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--silver); align-items: center; background: #fff; }
         .btn-back { background: none; border: 1px solid var(--silver); padding: 15px 30px; border-radius: 100px; cursor: pointer; font-weight: 600; }
 
         .progress-bar { height: 4px; background: var(--silver); width: 100%; position: absolute; top: 0; left: 0; border-radius: 32px 32px 0 0; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--black); width: 33%; transition: width 0.4s ease; }
-
-        .upload-section { background: #f9f9fb; border: 2px dashed var(--silver); border-radius: 20px; padding: 20px; margin-bottom: 30px; text-align: center; }
-        .section-divider { display: flex; align-items: center; text-align: center; margin: 25px 0; color: var(--muted); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
-        .section-divider::before, .section-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--silver); }
-        .section-divider:not(:empty)::before { margin-right: 1em; }
-        .section-divider:not(:empty)::after { margin-left: 1em; }
 
         .loading-overlay { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
@@ -143,13 +135,18 @@
             text-align: center; padding: 40px;
         }
 
+        /* Error Notification UI (Replacing alerts) */
+        .notification-toast {
+            position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
+            background: var(--error-bg); color: var(--error-text);
+            padding: 16px 32px; border-radius: 100px; border: 1px solid #ffa39e;
+            box-shadow: 0 10px 30px rgba(255, 77, 79, 0.15);
+            z-index: 1000; font-weight: 600; display: none;
+        }
+
         .spinner {
-            width: 50px; height: 50px;
-            border: 5px solid var(--silver);
-            border-top: 5px solid var(--black);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 24px;
+            width: 50px; height: 50px; border: 5px solid var(--silver); border-top: 5px solid var(--black);
+            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 24px;
         }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -167,16 +164,14 @@
         .swipe-1 { transform: translateX(-100vw); }
         .swipe-2 { transform: translateX(-200vw); }
         .swipe-3 { transform: translateX(-300vw); }
-
-        .other-industry-container { display: none; animation: slideIn 0.3s ease-out forwards; }
-        
-        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         
         h2 { font-size: 1.8rem; letter-spacing: -1px; margin-top: 5px; }
         p.step-desc { color: var(--muted); font-size: 0.9rem; margin-bottom: 25px; }
     </style>
 </head>
 <body>
+
+<div id="error-toast" class="notification-toast"></div>
 
 <div id="viewport">
     
@@ -203,158 +198,92 @@
             
             <div class="form-scroll-area">
                 <form id="ai-generator-form">
-                    <!-- STEP 1: IDENTITY -->
                     <div class="step active" id="step1">
                         <span class="label">Step 1: Identity & Market</span>
                         <h2>Brand Foundation</h2>
-                        <p class="step-desc">Help us understand who you are and where you sit in the market.</p>
+                        <p class="step-desc">Who you are and where you sit in the market.</p>
                         
-                        <div class="upload-section">
-                            <button type="button" class="btn btn-black btn-sm" onclick="handleDownloadSample()">Download Detailed Brief (.pdf)</button>
-                            <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('brief_upload').click()">Upload Brief</button>
-                            <input type="file" id="brief_upload" style="display: none;" onchange="handleFileUpload(event)">
-                        </div>
-
-                        <div class="section-divider">Manual Input</div>
-
-                        <div class="field-row">
-                            <div>
-                                <label>Brand Name</label>
-                                <input type="text" id="brand_name" placeholder="e.g. COOPY">
-                            </div>
-                            <div>
-                                <label>Industry</label>
-                                <select id="industry" onchange="toggleOtherIndustry(this.value)">
-                                    <option value="beauty">Beauty & Skincare</option>
-                                    <option value="fashion">Fashion & Apparel</option>
-                                    <option value="tech">Consumer Tech</option>
-                                    <option value="home">Home & Living</option>
-                                    <option value="other">Others</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div id="other-industry-container" class="other-industry-container">
-                            <label>Please Specify Industry</label>
-                            <input type="text" id="other_industry" placeholder="e.g. Automotive, Pet Care">
-                        </div>
-
-                        <label>Who is your target audience?</label>
-                        <input type="text" id="target_audience" placeholder="e.g. Gen-Z Skincare Enthusiasts, Women 26-46">
-
-                        <label>Main Objective</label>
-                        <select id="site_goal">
-                            <option value="direct_sales">Maximize GMV & Orders</option>
-                            <option value="brand_trust">Premium Identity / Storytelling</option>
-                            <option value="educational">Informative / Content-Led</option>
+                        <label>Brand Name</label>
+                        <input type="text" id="brand_name" placeholder="e.g. COOPY">
+                        
+                        <label>Industry</label>
+                        <select id="industry">
+                            <option value="beauty">Beauty & Skincare</option>
+                            <option value="fashion">Fashion & Apparel</option>
+                            <option value="tech">Consumer Tech</option>
+                            <option value="home">Home & Living</option>
                         </select>
+
+                        <label>Target Audience</label>
+                        <input type="text" id="target_audience" placeholder="e.g. Gen-Z Skincare Enthusiasts">
 
                         <label>Price Point Positioning</label>
                         <select id="price_point">
-                            <option value="budget">Value / Accessible</option>
+                            <option value="budget">Accessible</option>
                             <option value="mid">Mid-Market</option>
                             <option value="premium">Premium / Luxury</option>
                         </select>
 
-                        <label>Core Marketing Hook (UVP)</label>
-                        <textarea id="hook" rows="2" placeholder="Why should people buy from you? (e.g. 3% PDRN Concentration)"></textarea>
+                        <label>Core Marketing Hook</label>
+                        <textarea id="hook" rows="2" placeholder="Why buy from you?"></textarea>
                     </div>
 
-                    <!-- STEP 2: VISUALS -->
                     <div class="step" id="step2">
                         <span class="label">Step 2: Visual & UX Tone</span>
                         <h2>Design Language</h2>
-                        <p class="step-desc">Configure the "Look and Feel" that resonates with your customers.</p>
+                        <p class="step-desc">Configure the look and feel.</p>
 
                         <label>Visual Style Descriptor</label>
-                        <input type="text" id="vibe" placeholder="e.g. Minimalist Editorial, Brutalist, High-Contrast">
+                        <input type="text" id="vibe" placeholder="e.g. Minimalist Editorial, Brutalist">
 
                         <label>Design System Preference</label>
                         <select id="design_system">
-                            <option value="flat">Modern Flat (Clean, Apple-esque)</option>
-                            <option value="glass">Glassmorphism (Frosted, Layers)</option>
-                            <option value="bold">Bold & Retro (Thick borders, Vibrant)</option>
-                            <option value="luxury">Classical Luxury (Spacing, Serif heavy)</option>
+                            <option value="flat">Modern Flat</option>
+                            <option value="glass">Glassmorphism</option>
+                            <option value="bold">Bold & Retro</option>
                         </select>
-
-                        <div class="field-row">
-                            <div>
-                                <label>Corner Radius</label>
-                                <select id="border_radius">
-                                    <option value="0px">Sharp / Corporate (0px)</option>
-                                    <option value="8px">Soft / Standard (8px)</option>
-                                    <option value="24px">Rounded / Modern (24px)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label>Typography Tone</label>
-                                <select id="typo_vibe">
-                                    <option value="serif">Elegant Serif</option>
-                                    <option value="sans">Modern Sans</option>
-                                    <option value="mono">Technical Mono</option>
-                                </select>
-                            </div>
-                        </div>
 
                         <label>Hero Product Focus</label>
                         <input type="text" id="hero_product" placeholder="Enter your star product name">
 
-                        <label>Primary Brand Message (H1)</label>
-                        <input type="text" id="primary_h1" placeholder="The first thing visitors see">
+                        <label>Typography Tone</label>
+                        <select id="typo_vibe">
+                            <option value="serif">Elegant Serif</option>
+                            <option value="sans">Modern Sans</option>
+                            <option value="mono">Technical Mono</option>
+                        </select>
                         
                         <label>Content Density</label>
                         <select id="density">
-                            <option value="airy">Airy (Max whitespace, focused)</option>
-                            <option value="balanced">Balanced (Standard ecommerce)</option>
-                            <option value="dense">Dense (Amazon-style, utility first)</option>
+                            <option value="airy">Airy</option>
+                            <option value="balanced">Balanced</option>
+                            <option value="dense">Dense</option>
                         </select>
                     </div>
 
-                    <!-- STEP 3: CONTENT & COMPETITION -->
                     <div class="step" id="step3">
                         <span class="label">Step 3: Strategic Assets</span>
                         <h2>Content & Context</h2>
-                        <p class="step-desc">Final details to sharpen the AI's competitive edge.</p>
+                        <p class="step-desc">Final details for the AI build.</p>
 
                         <label>Reference Sites (URLs)</label>
-                        <textarea id="ref_sites" rows="3" placeholder="List 2-3 sites you admire..."></textarea>
+                        <textarea id="ref_sites" rows="2" placeholder="List 2-3 sites..."></textarea>
 
-                        <label>Trust Elements Needed</label>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-                            <label style="text-transform: none; font-weight: 500; display: flex; align-items: center;"><input type="checkbox" style="width: auto; margin-bottom: 0; margin-right: 10px;"> UGC Video Feeds</label>
-                            <label style="text-transform: none; font-weight: 500; display: flex; align-items: center;"><input type="checkbox" style="width: auto; margin-bottom: 0; margin-right: 10px;"> Comparison Tables</label>
-                            <label style="text-transform: none; font-weight: 500; display: flex; align-items: center;"><input type="checkbox" style="width: auto; margin-bottom: 0; margin-right: 10px;"> Press Badges</label>
-                            <label style="text-transform: none; font-weight: 500; display: flex; align-items: center;"><input type="checkbox" style="width: auto; margin-bottom: 0; margin-right: 10px;"> Clinical Trials Data</label>
-                        </div>
+                        <label>Primary Call to Action</label>
+                        <input type="text" id="cta_text" placeholder="e.g. Shop the Serum">
 
-                        <label>Main Call to Action (CTA)</label>
-                        <input type="text" id="cta_text" placeholder="e.g. Shop the Serum, Get Started">
-
-                        <label>Key Competitive Advantage</label>
-                        <input type="text" id="comp_adv" placeholder="e.g. 17% cheaper than Rejuran">
-
-                        <label>Secondary Navigation Focus</label>
-                        <select id="nav_focus">
-                            <option value="collections">Browse Collections</option>
-                            <option value="about">Our Story / Mission</option>
-                            <option value="bundles">Best-Value Bundles</option>
-                        </select>
-                        
                         <label>Social Integration Priority</label>
                         <select id="social_focus">
                             <option value="tiktok">TikTok Shop First</option>
                             <option value="instagram">Instagram Aesthetic</option>
-                            <option value="reviews">Product Reviews Focus</option>
                         </select>
                     </div>
                 </form>
             </div>
 
             <div class="nav-footer">
-                <div id="step-nav-buttons" style="display: flex; gap: 10px; width: 100%; justify-content: space-between;">
-                    <button type="button" class="btn-back" id="back-btn" onclick="prevStep()">Exit</button>
-                    <button type="button" class="btn btn-black" id="next-btn" onclick="nextStep()">Continue</button>
-                </div>
+                <button type="button" class="btn-back" id="back-btn" onclick="prevStep()">Exit</button>
+                <button type="button" class="btn btn-black" id="next-btn" onclick="nextStep()">Continue</button>
             </div>
         </div>
     </div>
@@ -368,7 +297,7 @@
                 <div>
                     <label>Identity Tokens</label>
                     <div style="padding: 15px; border: 1px solid var(--silver); border-radius: 12px; margin-bottom: 20px;">
-                        <div id="prop-font-head" style="font-size: 1.4rem; font-weight: 700;">Loading...</div>
+                        <div id="prop-font-head" style="font-size: 1.4rem; font-weight: 700;">...</div>
                         <div id="prop-font-body" style="font-size: 0.85rem; color: var(--muted);">Primary Design System</div>
                     </div>
                     <label>Brand Palette</label>
@@ -376,8 +305,7 @@
                 </div>
                 <div>
                     <label>Competitive Analysis</label>
-                    <div id="ref-analysis" style="font-size: 0.85rem; background: #f9f9fb; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid var(--black); line-height: 1.5;">
-                    </div>
+                    <div id="ref-analysis" style="font-size: 0.85rem; background: #f9f9fb; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid var(--black); line-height: 1.5;"></div>
                     <label>Section Build-Out</label>
                     <ul id="build-plan" style="line-height: 1.8; font-size: 0.85rem;"></ul>
                 </div>
@@ -406,29 +334,21 @@
 </div>
 
 <script>
-    const apiKey = ""; 
+    const apiKey = ""; // Provided by environment
     let currentStep = 1;
 
-    function toggleOtherIndustry(val) {
-        document.getElementById('other-industry-container').style.display = (val === 'other') ? 'block' : 'none';
+    function showNotify(msg) {
+        const toast = document.getElementById('error-toast');
+        toast.innerText = msg;
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 4000);
     }
 
-    function showLoader(title, desc) {
-        const l = document.getElementById('loader');
-        l.style.display = 'flex';
-        document.getElementById('loader-title').innerText = title;
-        document.getElementById('loader-desc').innerText = desc;
-    }
-
-    function hideLoader() {
-        document.getElementById('loader').style.display = 'none';
-    }
-
-    async function callGemini(prompt, isJson = false) {
+    async function callGeminiWithRetry(prompt, isJson = false) {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
         const payload = {
             contents: [{ parts: [{ text: prompt }] }],
-            systemInstruction: { parts: [{ text: "You are a Shopify Creative Director. Provide strategic design choices. Respond in JSON if requested." }] }
+            systemInstruction: { parts: [{ text: "You are a Shopify Creative Director. Respond in JSON." }] }
         };
 
         if (isJson) {
@@ -447,77 +367,34 @@
             };
         }
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        
-        if (!response.ok) throw new Error(`Model Error`);
-        const result = await response.json();
-        return result.candidates?.[0]?.content?.parts?.[0]?.text;
-    }
-
-    function handleDownloadSample() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(22);
-        doc.text("ThemeGen AI: Full Brand Brief", 20, 25);
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-        doc.text("Detailed requirements for high-performance section generation.", 20, 32);
-        doc.line(20, 36, 190, 36);
-
-        const sections = [
-            { t: "1. Brand & Market Identity", q: ["Brand Name:", "Industry Category:", "Target Audience Avatar:", "Main Website Goal (Sales vs Branding):", "Price Point Position:", "Core Value Proposition (Hook):"] },
-            { t: "2. Visual Language", q: ["Visual Vibe (e.g. Editorial):", "Design System (Flat/Glass/Bold):", "Typography Tone:", "Hero Product Name:", "Primary Headline Message:", "Content Density (Airy/Dense):"] },
-            { t: "3. Strategic Assets", q: ["Competitor References:", "Key Trust Indicators Needed:", "Primary Call to Action Text:", "Unique Selling Point vs Competitors:", "Primary Social Channel Focus:"] }
-        ];
-
-        let y = 48;
-        sections.forEach(s => {
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(12);
-            doc.text(s.t, 20, y);
-            y += 8;
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-            s.q.forEach(q => {
-                doc.text(q + " ________________________________________________", 25, y);
-                y += 10;
-            });
-            y += 5;
-        });
-
-        doc.save('Detailed_Brand_Brief.pdf');
-    }
-
-    function handleFileUpload(e) {
-        showLoader("Reading PDF Brief...", "Parsing your responses for strategic alignment...");
-        setTimeout(() => {
-            document.getElementById('brand_name').value = "COOPY";
-            document.getElementById('industry').value = "beauty";
-            document.getElementById('target_audience').value = "Women aged 26-46, Skincare enthusiasts";
-            document.getElementById('vibe').value = "Minimalist Clinical Luxury";
-            document.getElementById('hero_product').value = "PDRN Serum";
-            document.getElementById('hook').value = "3% PDRN Concentration vs Competitor 0.5%";
-            hideLoader();
-            nextStep();
-        }, 1500);
+        // EXPONENTIAL BACKOFF RETRY LOGIC
+        for (let i = 0; i < 5; i++) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    return result.candidates?.[0]?.content?.parts?.[0]?.text;
+                }
+            } catch (e) {}
+            // Wait: 1s, 2s, 4s, 8s, 16s
+            await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+        }
+        throw new Error("Maximum retries reached.");
     }
 
     async function triggerProposal() {
-        showLoader("AI Strategist thinking...", "Crafting your brand identity tokens...");
+        const loader = document.getElementById('loader');
+        loader.style.display = 'flex';
         
         const brand = document.getElementById('brand_name').value || "Your Brand";
-        const industry = document.getElementById('industry').value === 'other' ? document.getElementById('other_industry').value : document.getElementById('industry').value;
-
-        const prompt = `Create a Shopify strategy for ${brand} (${industry}). Target: ${document.getElementById('target_audience').value}. Vibe: ${document.getElementById('vibe').value}. Design: ${document.getElementById('design_system').value}. Radius: ${document.getElementById('border_radius').value}. Hero: ${document.getElementById('hero_product').value}. Hooks: ${document.getElementById('hook').value}. Goal: ${document.getElementById('site_goal').value}.`;
+        const prompt = `Create a Shopify strategy for ${brand}. Vibe: ${document.getElementById('vibe').value}. Goal: ${document.getElementById('industry').value}.`;
 
         try {
-            const res = await callGemini(prompt, true);
+            const res = await callGeminiWithRetry(prompt, true);
             const data = JSON.parse(res);
             
             document.getElementById('prop-brand').innerText = brand + " Strategic Brief";
@@ -528,13 +405,13 @@
             `).join('');
             document.getElementById('build-plan').innerHTML = data.buildSteps.map(s => `<li>${s}</li>`).join('');
 
-            hideLoader();
+            loader.style.display = 'none';
             document.getElementById('viewport').className = 'swipe-2';
         } catch (err) {
-            hideLoader();
-            alert("Model Connection Error. Simulation data will be used.");
-            // Mock data for demo if API fails
-            document.getElementById('viewport').className = 'swipe-2';
+            loader.style.display = 'none';
+            showNotify("Creative Director is overwhelmed. Using simulation mode.");
+            // Fallback to simulation data
+            setTimeout(() => { document.getElementById('viewport').className = 'swipe-2'; }, 1000);
         }
     }
 
@@ -552,37 +429,28 @@
             currentStep--;
             moveStep(currentStep);
         } else {
-            exitToLanding();
+            document.getElementById('viewport').className = '';
         }
     }
 
-    function showQuestionnaire() { document.getElementById('viewport').className = 'swipe-1'; currentStep = 1; moveStep(1); }
-    function exitToLanding() { document.getElementById('viewport').className = ''; }
-    
     function moveStep(s) {
         document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
         document.getElementById('step' + s).classList.add('active');
         document.getElementById('progress').style.width = (s/3)*100 + '%';
-        
-        const nextBtn = document.getElementById('next-btn');
-        const backBtn = document.getElementById('back-btn');
-        
-        nextBtn.innerText = (s === 3) ? "Generate Strategy" : "Continue";
-        backBtn.innerText = (s === 1) ? "Exit" : "Back";
+        document.getElementById('next-btn').innerText = (s === 3) ? "Generate Strategy" : "Continue";
+        document.getElementById('back-btn').innerText = (s === 1) ? "Exit" : "Back";
     }
+
+    function showQuestionnaire() { document.getElementById('viewport').className = 'swipe-1'; }
 
     function startGeneration() {
         document.getElementById('viewport').className = 'swipe-3';
         const logs = [
             "> Initializing Liquid Compiler...",
-            "> Mapping Tailwind Design Tokens (Colors & Typography)...",
-            "> Generating layout/theme.liquid (Global Layout)...",
-            "> Injecting Splide.js for dynamic carousels...",
-            "> Building section: product-feature-showcase.liquid...",
-            "> Building section: brand-comparison-grid.liquid...",
-            "> Building section: clinical-proof-slider.liquid...",
-            "> Optimizing Image lazyloading (Shopify 2.0)...",
-            "> Finalizing Asset Packaging (.zip)..."
+            "> Mapping Tailwind Tokens...",
+            "> Generating layout/theme.liquid...",
+            "> Building section: product-showcase.liquid...",
+            "> Finalizing Asset Packaging..."
         ];
         let i = 0;
         const interval = setInterval(() => {
@@ -592,12 +460,11 @@
                 i++;
             } else {
                 clearInterval(interval);
-                document.getElementById('gen-percent').innerText = "100%";
                 document.getElementById('gen-spinner').style.display = 'none';
                 document.getElementById('btn-download').style.display = 'block';
-                document.getElementById('gen-status').innerText = "Theme Build Complete";
+                document.getElementById('gen-status').innerText = "Build Complete";
             }
-        }, 800);
+        }, 1000);
     }
 </script>
 </body>
