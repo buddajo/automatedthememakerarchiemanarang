@@ -195,13 +195,14 @@
             </div>
             
             <div class="form-scroll-area">
-                <form id="ai-generator-form">
+                <!-- Added onsubmit to prevent accidental page reloads when hitting enter -->
+                <form id="ai-generator-form" onsubmit="event.preventDefault(); nextStep();">
                     <div class="step active" id="step1">
                         <span class="label">Step 1: Identity & Market</span>
                         <h2>Brand Foundation</h2>
                         <p class="step-desc">Establish your core brand identity and competitive market positioning.</p>
                         
-                        <!-- PDF ACTION BUTTONS (Placed securely under description) -->
+                        <!-- PDF ACTION BUTTONS -->
                         <div class="import-export-row">
                             <a class="action-link" onclick="document.getElementById('import-file').click()">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
@@ -347,7 +348,8 @@
 </div>
 
 <script>
-    const apiKey = ""; // Will be injected by the environment
+    const apiKey = ""; // Environment handles the injection.
+    let currentStep = 1;
 
     function showNotify(msg) {
         const toast = document.getElementById('error-toast');
@@ -356,13 +358,20 @@
         setTimeout(() => toast.style.display = 'none', 5000);
     }
 
-    // PDF GENERATION (Real PDF, not JSON or Text)
+    // PDF GENERATION (Comprehensive extraction matching all steps)
     function downloadPDFBrief() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
-        // Grab current values to pre-fill the PDF if user has typed anything
-        const getVal = (id) => document.getElementById(id).value || "";
+        // Helper to get dropdown text cleanly, or input values
+        const getVal = (id) => {
+            const el = document.getElementById(id);
+            if (!el) return "";
+            if (el.tagName === "SELECT") {
+                return el.options[el.selectedIndex].text;
+            }
+            return el.value || "";
+        };
 
         doc.setFont("helvetica", "bold");
         doc.setFontSize(22);
@@ -378,6 +387,9 @@
         let y = 48;
 
         const writeSection = (title, fields) => {
+            // Basic page break check for section headers
+            if (y > 250) { doc.addPage(); y = 20; }
+            
             doc.setFontSize(14);
             doc.setTextColor(0);
             doc.setFont("helvetica", "bold");
@@ -386,10 +398,13 @@
             
             doc.setFontSize(10);
             doc.setFont("helvetica", "normal");
+            
             fields.forEach(f => {
+                // Page break check for individual fields
+                if (y > 275) { doc.addPage(); y = 20; }
+                
                 doc.text(f.label, 25, y);
                 doc.setTextColor(100);
-                // Draw a line for the user to write on, or fill it with their current input
                 const answerLine = f.val ? f.val : "________________________________________________________";
                 doc.text(answerLine, 25, y + 6);
                 doc.setTextColor(0);
@@ -400,32 +415,40 @@
 
         writeSection("1. Brand Foundation", [
             { label: "Brand Name:", val: getVal('brand_name') },
+            { label: "Industry:", val: getVal('industry') },
             { label: "Target Audience:", val: getVal('target_audience') },
+            { label: "Price Point Positioning:", val: getVal('price_point') },
             { label: "Core Marketing Hook:", val: getVal('hook') }
         ]);
 
         writeSection("2. Design Language", [
             { label: "Visual Style Descriptor (e.g. Minimalist):", val: getVal('vibe') },
-            { label: "Hero Product Focus:", val: getVal('hero_product') }
+            { label: "Design System Preference:", val: getVal('design_system') },
+            { label: "Hero Product Focus:", val: getVal('hero_product') },
+            { label: "Typography Tone:", val: getVal('typo_vibe') },
+            { label: "Content Density:", val: getVal('density') }
         ]);
 
         writeSection("3. Strategic Assets", [
             { label: "Reference Sites (URLs):", val: getVal('ref_sites') },
-            { label: "Primary Call to Action:", val: getVal('cta_text') }
+            { label: "Primary Call to Action:", val: getVal('cta_text') },
+            { label: "Social Integration Priority:", val: getVal('social_focus') }
         ]);
 
+        // Footer
+        if (y > 270) { doc.addPage(); y = 20; }
         doc.setFontSize(9);
         doc.setTextColor(150);
-        doc.text("Once completed, upload this PDF back into the ThemeGen AI Onboarding portal.", 20, 280);
+        doc.text("Once completed, upload this PDF back into the ThemeGen AI Onboarding portal.", 20, y + 10);
 
         doc.save('ThemeGen_Questionnaire.pdf');
-        showNotify("PDF Questionnaire downloaded successfully.");
+        showNotify("Comprehensive PDF Questionnaire downloaded.");
     }
 
     // PDF PARSING VIA AI
     async function analyzePDF(base64Data) {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-        const prompt = "Analyze this PDF questionnaire. Extract the following details into a JSON object strictly matching these exact keys: brand_name, target_audience, hook, vibe, hero_product, ref_sites, cta_text. If a field is blank, infer it from the brand name or leave it empty.";
+        const prompt = "Analyze this PDF questionnaire. Extract the following details into a JSON object strictly matching these exact keys: brand_name, industry, target_audience, price_point, hook, vibe, design_system, hero_product, typo_vibe, density, ref_sites, cta_text, social_focus. If a field is blank, infer it from the brand name or leave it empty.";
         
         const payload = {
             contents: [{
@@ -464,13 +487,11 @@
         reader.onload = async function(e) {
             try {
                 const base64 = e.target.result.split(',')[1];
-                
-                // Attempt to use API to parse PDF
                 let data;
+                
                 try {
                     data = await analyzePDF(base64);
                 } catch (apiErr) {
-                    // FALLBACK: If API blocks PDF MimeType in this sandbox, use simulation data
                     console.log("Falling back to simulated extraction...");
                     data = {
                         brand_name: "COOPY",
@@ -489,7 +510,6 @@
                     };
                 }
 
-                // Populate UI
                 for (let key in data) {
                     const el = document.getElementById(key);
                     if (el) el.value = data[key];
@@ -499,7 +519,7 @@
                 showNotify("Error processing PDF file.");
             } finally {
                 loader.style.display = 'none';
-                event.target.value = ''; // Reset input
+                event.target.value = ''; 
             }
         };
         reader.readAsDataURL(file);
@@ -589,7 +609,14 @@
         document.getElementById('next-btn').innerText = (s === 3) ? "Generate Strategy" : "Continue";
         document.getElementById('back-btn').innerText = (s === 1) ? "Exit" : "Back";
     }
-    function showQuestionnaire() { document.getElementById('viewport').className = 'swipe-1'; }
+    
+    // Reset explicitly to step 1 when returning to the questionnaire to fix button mapping
+    function showQuestionnaire() { 
+        document.getElementById('viewport').className = 'swipe-1'; 
+        currentStep = 1;
+        moveStep(1);
+    }
+    
     function startGeneration() {
         document.getElementById('viewport').className = 'swipe-3';
         const logs = ["> Mapping Tailwind Tokens...", "> Generating layout/theme.liquid...", "> Building section: product-showcase.liquid...", "> Optimizing Image Pipelines...", "> Finalizing Asset Packaging..."];
