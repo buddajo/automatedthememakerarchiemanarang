@@ -180,10 +180,26 @@
         .color-dot { width: 30px; height: 30px; border-radius: 50%; display: inline-block; margin-right: 10px; border: 1px solid #ddd; }
         .palette-item { display: flex; align-items: center; margin-bottom: 15px; font-size: 0.9rem; }
         
+        /* Circle Loader Style */
         .loading-overlay { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(255,255,255,0.95); z-index: 10; display: none;
             flex-direction: column; justify-content: center; align-items: center; border-radius: 32px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--silver);
+            border-top: 4px solid var(--black);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* CONSOLE STYLE */
@@ -225,8 +241,9 @@
         <div class="form-container">
             <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
             <div class="loading-overlay" id="loader">
-                <div style="font-size: 1.5rem; font-weight: 600;">Creative Director is thinking...</div>
-                <p>Analyzing industry and choosing design system.</p>
+                <div class="spinner"></div>
+                <div id="loader-title" style="font-size: 1.5rem; font-weight: 600;">Creative Director is thinking...</div>
+                <p id="loader-desc">Analyzing industry and choosing design system.</p>
             </div>
             
             <form id="ai-generator-form">
@@ -412,6 +429,7 @@
             </div>
 
             <div class="nav-footer">
+                <div id="gen-spinner" class="spinner" style="width: 32px; height: 32px; margin-bottom: 0;"></div>
                 <button type="button" id="btn-download" class="btn btn-black" style="display: none;" onclick="location.reload()">Download Theme (.zip)</button>
                 <button type="button" id="btn-preview-link" class="btn btn-outline" style="display: none;">View Live Preview</button>
             </div>
@@ -488,16 +506,26 @@
         document.getElementById('progress').style.width = (stepNum / 3) * 100 + '%';
     }
 
+    // FUNCTIONAL DOWNLOAD SIMULATION
     function handleDownloadSample() {
-        alert("Downloading 'ThemeGen_Brand_Brief_Template.pdf'...");
+        const text = "ThemeGen Brand Brief Template\n\n1. Brand Identity\n2. Design Preferences\n3. Market Positioning\n4. Technical Requirements";
+        const blob = new Blob([text], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ThemeGen_Brand_Brief_Template.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 
     function handleFileUpload(event) {
         const file = event.target.files[0];
         if (file) {
             document.getElementById('loader').style.display = 'flex';
-            document.getElementById('loader').querySelector('div').innerText = "Processing Document...";
-            document.getElementById('loader').querySelector('p').innerText = "Extracting brand identity and objectives...";
+            document.getElementById('loader-title').innerText = "Processing Document...";
+            document.getElementById('loader-desc').innerText = "Extracting brand identity and objectives...";
             
             setTimeout(() => {
                 document.getElementById('brand_name').value = "COOPY";
@@ -530,8 +558,8 @@
         };
 
         document.getElementById('loader').style.display = 'flex';
-        document.getElementById('loader').querySelector('div').innerText = "AI Creative Director is thinking...";
-        document.getElementById('loader').querySelector('p').innerText = "Analyzing color choices and reference sites...";
+        document.getElementById('loader-title').innerText = "AI Creative Director is thinking...";
+        document.getElementById('loader-desc').innerText = "Analyzing color choices and reference sites...";
 
         const prompt = `Generate a Shopify design proposal based on this brief:
         Brand: ${formData.brand} in ${formData.industry}. 
@@ -577,6 +605,7 @@
         const consoleEl = document.getElementById('console-output');
         const statusEl = document.getElementById('gen-status');
         const percentEl = document.getElementById('gen-percent');
+        const genSpinner = document.getElementById('gen-spinner');
         
         const logs = [
             { msg: "> Scaffold: Injecting base.css resets (62.5% scale)...", status: "Configuring CSS", p: 15 },
@@ -598,6 +627,7 @@
                 i++;
             } else {
                 clearInterval(interval);
+                genSpinner.style.display = 'none';
                 document.getElementById('btn-download').style.display = 'block';
                 document.getElementById('btn-preview-link').style.display = 'block';
             }
